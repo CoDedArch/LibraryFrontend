@@ -21,6 +21,16 @@ const config: Config = {
           400: '#F8EFEA'
         }
       },
+      fontFamily: {
+        title: ['Dailymirror', 'Personal', 'Use'],
+        about: ['Open Sans'],
+        projects: ['Oswald','Tilt Prism'],
+        description: ['Handlee'],
+        body:['Montserrat'],
+        quote: ['Sail'],
+        main: ['DM Serif Display'],
+        sub: ['IBM Plex Sans'],
+      },
     },
   },
   plugins: [],
