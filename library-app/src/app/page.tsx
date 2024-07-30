@@ -44,7 +44,7 @@ export default function Home() {
         <p className="p-3 md:pl-[5em] text-blue-700">Benefits of using let&apos;s learn</p>
         {/* tell the user about */}
         <div className="flex space-x-4 justify-center">
-          <div><Image src="/images/backward.png" alt="back icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></div>
+          <button><Image src="/images/backward.png" alt="back icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></button>
           <div className="flex bg-orange-400 bg-opacity-10 space-x-3 max-w-[18em]">
             <div className="pt-6">
               <Image src="/images/goals.png" alt="goals icon" width={100} height={50}/>
@@ -72,7 +72,7 @@ export default function Home() {
               <p className="font-extralight">With let&apos;s learn, you can set and monitor your personal learning goals</p>
             </div>
           </div>
-          <div><Image src="/images/forward.png" alt="forward icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></div>
+          <button><Image src="/images/forward.png" alt="forward icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></button>
         </div>
       </section>
       {
