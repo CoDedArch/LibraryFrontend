@@ -1,6 +1,7 @@
 "use client"
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import {useEffect,useState, useRef } from "react";
@@ -34,7 +35,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
         <header className="flex flex-row justify-between p-2 text-lg md:pr-[9em]">
           <div className="p-2 font-extrabold text-2xl flex space-x-6">
             {/* This contains the Logo and the Name of the application */}
-            <p>Let&lsquo;s Learn</p>
+            <Link href="/">Let&lsquo;s Learn</Link>
             <p className="absolute top-[2.4em] md:static font-extralight text-2xl md:text-lg p-1 md:bg-orange-200 bg-opacity-25 hover:bg-opacity-10 transition-opacity">
               <a href="http://" className=" hover:text-orange-300 transition-colors">My Books</a>
             </p>
@@ -61,8 +62,8 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             <div className="relative md:-left-28 p-3">
               <Image src="/images/search.png" alt="search icon" className="w-[1.4em] cursor-pointer" width={40} height={50}/>
             </div>
-            <a href="" className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono">Log in</a>
-            <button className="hidden sm:block bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</button>
+            <Link href="" className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono">Log in</Link>
+            <Link href="/signup" className="hidden sm:block text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</Link>
             <button className="p-2" onClick={renderMenu}>
               <Image src="/images/menu.png" alt="menu button" width={30} height={50} />
             </button>
@@ -74,7 +75,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                     <p className="text-center border-b-2 border-b-yellow-800 font-description">my Let&apos;s learn</p>
                     <div className="flex space-x-2 md:space-x-3 py-2">
                       <button className="bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">log in</button>
-                      <button className="bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</button>
+                      <Link href="/signup" className="text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</Link>
                     </div>
                     <p className="text-center border-b-2 border-b-yellow-800 font-description mt-3">Browse</p>
                     <ul>
