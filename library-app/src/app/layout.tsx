@@ -62,7 +62,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
             <div className="relative md:-left-28 p-3">
               <Image src="/images/search.png" alt="search icon" className="w-[1.4em] cursor-pointer" width={40} height={50}/>
             </div>
-            <Link href="" className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono">Log in</Link>
+            <Link href="/login" className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono">Log in</Link>
             <Link href="/signup" className="hidden sm:block text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</Link>
             <button className="p-2" onClick={renderMenu}>
               <Image src="/images/menu.png" alt="menu button" width={30} height={50} />
@@ -74,7 +74,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                   <section ref={menuRef} className="absolute bg-orange-200 shadow-2xl z-[1000] -right-[0.5px] md:right-[1em] w-[11em] rounded-t-md h-[20em]">
                     <p className="text-center border-b-2 border-b-yellow-800 font-description">my Let&apos;s learn</p>
                     <div className="flex space-x-2 md:space-x-3 py-2">
-                      <button className="bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">log in</button>
+                      <Link href="/login" className="text-center pt-1 bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">log in</Link>
                       <Link href="/signup" className="text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</Link>
                     </div>
                     <p className="text-center border-b-2 border-b-yellow-800 font-description mt-3">Browse</p>
