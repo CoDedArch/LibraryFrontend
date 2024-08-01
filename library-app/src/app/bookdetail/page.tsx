@@ -37,8 +37,8 @@ export default function BookDetails() {
     
     return (
         <main className="h-fit">
-            <section className="mt-[3em] md:mt-0 md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md p-2">
-                <div className="hidden bg-blue-300 bg-opacity-10 p-2 w-1/5 md:flex flex-col items-center rounded-md border-r-2 border-2 border-black">
+            <section className="relative mt-[3em] md:mt-0 md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md p-2">
+                <div className="relative top-[17em] md:static bg-blue-300 bg-opacity-10 p-2 md:w-1/5 flex flex-col items-center rounded-md border-r-2 border-2 border-black">
                     <div className="h-[13em] bg-blue-400 w-[10em]">book image</div>
                     <p className="font-serif mt-2">Genre: <span className="font-bold font-description">&lt;Fictional&gt;</span></p>
                     <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg">
@@ -69,19 +69,19 @@ export default function BookDetails() {
 
                     </div>
                 </div>
-                <div className="w-full flex flex-col pb-3 pl-2">
+                <div className="relative -top-[31em] md:static w-full flex flex-col pb-3 pl-2">
                     <ul className="flex space-x-7 justify-center border-b-2 border-b-black">
                         <li className="w-[10em] text-center py-2 bg-green-300 bg-opacity-15 hover:bg-green-300 hover:bg-opacity-15 hover:transition-all h-[2.5em] rounded-md">Overview</li>
                         <li className="w-[10em] text-center py-2 hover:bg-green-300 hover:bg-opacity-15 hover:transition-all h-[2.5em] rounded-md">Details</li>
                         <li className="w-[10em] text-center py-2 hover:bg-green-300 hover:bg-opacity-15 hover:transition-all h-[2.5em] rounded-md">Inquiries</li>
-                        <li className="w-[10em] text-center py-2 hover:bg-green-300 hover:bg-opacity-15 hover:transition-all h-[2.5em] rounded-md">Related Books</li>
+                        <li className="w-[10em] text-center py-2 hover:bg-green-300 hover:bg-opacity-15 hover:transition-all md:h-[2.5em] h-[3.5em] rounded-md">Related Books</li>
                     </ul>
                     <p className="mt-2">An edition of <span className="underline italic font-bold">El hombre mas rico de Babilonia</span> (2014)</p>
-                    <h1 className="text-5xl w-[10em]">El hombre mas rico de Babilonia</h1>
+                    <h1 className="text-3xl md:text-5xl md:w-[10em]">El hombre mas rico de Babilonia</h1>
                     <p className="mt-1">by <span className="font-main underline">Kelvin CoDed</span></p>
-                    <div className="mt-[3em]">
+                    <div className="mt-[38em] md:mt-[3em]">
                         <ul className="flex space-x-3">
-                            <li className="flex"><Image src="/images/star2.png" alt="star" width={30} height={30} /><span className="pl-2  mt-1 font-bold">5.0</span></li>
+                            <li className="absolute top-[13em] md:static flex"><Image src="/images/star2.png" alt="star" width={30} height={30} /><span className="pl-2  mt-1 font-bold">5.0</span></li>
                             <li className="border-l-2 border-l-black mt-1 pl-2"> 10 ratings</li>
                             <li className="border-l-2 border-l-black mt-1 pl-2"> 180 want to read</li>
                             <li className="border-l-2 border-l-black mt-1 pl-2"> 2 currently reading</li>
@@ -118,7 +118,7 @@ export default function BookDetails() {
                     </div>
                     <div className="mt-[2em]">
                         <p className="font-light text-2xl">More Books by this Author</p>
-                        <div className="flex space-x-2 md:space-x-10 justify-center">
+                        <div className="flex space-x-2 md:space-x-10 justify-center mt-[2em]">
                             {/* More books from the author */}
                             <div className="flex space-x-4 justify-center">
                                 <div className="flex flex-col justify-center mr-10">
