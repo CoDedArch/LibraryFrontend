@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect,useState } from "react";
 
 export default function Home() {
@@ -85,12 +86,12 @@ export default function Home() {
                 {
                   item === "kids" &&
                   selectedBooks.map((book, b_index) => (
-                    <div key={index} className="bg-yellow-300 w-[8em] md:w-[10em] shadow-2xl flex flex-col justify-end md:block max-h-[16em] md:max-h-none">
+                    <Link key={index} href="/bookdetail" className="bg-yellow-300 w-[8em] md:w-[10em] shadow-2xl flex flex-col justify-end md:block max-h-[16em] md:max-h-none">
                       <p className="h-[13em] max-h-[13em] md:w-[10em] bg-blue-400">img</p>
                       <p className="font-projects pl-2">{ book.name}</p>
                       <p className="font-title pl-2">{ book.author}</p>
                       <p className="flex justify-end pr-1">{ book.dateOfPublication}</p>
-                    </div>
+                    </Link>
                     ))
                 }
               </div>
