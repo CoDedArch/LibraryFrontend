@@ -10,9 +10,9 @@ interface BookProps {
 
 const BookComp: React.FC<BookProps> = ({ book }) => {
   return (
-    <Link href="/bookdetail" className="bg-orange-200 bg-opacity-25 w-[8em] md:w-[10em] shadow-2xl flex flex-col max-h-[19em] md:max-h-none">
+    <Link href={`/bookdetail/${book.id}`} className="bg-orange-200 bg-opacity-25 w-[8em] md:w-[10em] shadow-2xl flex flex-col max-h-[19em] md:max-h-none">
         <p className="h-[13em] max-h-[13em] md:w-[10em]">
-            <Image src={book.cover_img} alt={book.title} className="w-full h-full" width={90} height={30} />
+            <Image src={book.cover_img} alt={book.title} className="w-full h-full" width={1230} height={30} />
         </p>
         <div className="mt-auto">
             <p className="font-projects pl-2">{ book.title}</p>

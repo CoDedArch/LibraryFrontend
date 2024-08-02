@@ -14,10 +14,10 @@ const metadata: Metadata = {
 };
 
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
-  const browse_links = ["subjects", "trending", "lists", "My Books"]
+  const browse_links = ["all books", "trending", "lists", "My Books"]
   const contribs = ["Add a Book"]
   const [showmenu, setShowMenu] = useState(false);
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const renderMenu = () => {
       setShowMenu(!showmenu)
   }
@@ -81,7 +81,7 @@ export default function RootLayout({ children, }: { children: React.ReactNode })
                     <ul>
                       {
                         browse_links.map((link, link_index) => (
-                          <li key={link_index} className="pt-2 hover:bg-creamy-100 hover:bg-opacity-20"><a href="" className="pl-2">{link}</a> </li>
+                          <li key={link_index} className="pt-2 hover:bg-creamy-100 hover:bg-opacity-20"><Link href={link === "all books" ? "/" : `/${link}`} className="pl-2">{link}</Link></li>
                         ))
                       }
                     </ul>
