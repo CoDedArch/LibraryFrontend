@@ -1,10 +1,20 @@
 "use client"
 import { headers } from "next/headers";
 import Image from "next/image";
+import { useState } from "react";
 
-const SIGNUP_URL = ""
+const SIGNUP_URL = "http://127.0.0.1:8000/api/user/create_reader"
 export default function Signup() {
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const [message, setMessage] = useState('');
+    const [messageStyle, setMessageStyle] = useState('');
+    const [showMessage, setShowMessage] = useState(false);
+    const success_styles = "bg-green-500 bg-opacity-30";
+    const error_styles = "bg-red-400 bg-opacity-50";
+    const success_text = "Account Created ...";
+    const error_text = "Account Creation Failed";
+    const login_failed_text = "Auto Loging in Failed!";
+
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         console.log(event, event.target);
         const form = event.target as HTMLFormElement;
@@ -18,10 +28,46 @@ export default function Signup() {
             },
             body: jsonData
         }
-        // fetch(url, requestOptions)
+        const signupResponse = await fetch(SIGNUP_URL, requestOptions);
+        const signupData = await signupResponse.json();
+        if (signupResponse.ok) {
+            const loginData = {
+                username: objectFromForm.username,
+                password: objectFromForm.password
+            };
+            const loginResponse = await fetch('/api/login', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(loginData)
+            });
+            setMessage(success_text);
+            setMessageStyle(success_styles);
+            const loginResult = await loginResponse.json();
+            if (loginResponse.ok) {
+                setShowMessage(true);
+                setTimeout(() => setShowMessage(false), 2000);
+                window.location.href = '/';
+                // Redirect or update UI as needed
+            } else {
+                setMessage(login_failed_text);
+                setMessageStyle(error_styles);
+                setShowMessage(true);
+                setTimeout(() => setShowMessage(false), 3000);
+            }
+        } else {
+            setMessage(error_text);
+            setMessageStyle(error_styles);
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 3000);
+        }
     }
     return (
         <>
+            <div className={`absolute top-[10em] md:top-[7em] right-2 md:left-[15em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 ${showMessage ? '' : 'hidden'} ${messageStyle}`}>
+                <p>{message}</p>
+            </div>
             <section className="mt-[3em] md:mt-0 md:flex bg-orange-200 md:mx-[15em] bg-opacity-25 h-fit justify-between rounded-md">
                 <div className="hidden w-1/2 md:flex flex-col justify-center px-7 border-r-2 border-r-creamy-100">
                     <p className="text-5xl">sign up</p>
@@ -34,7 +80,7 @@ export default function Signup() {
                         <legend className="font-bold">Name</legend>
                         <input required type="text" name="fullname" placeholder="full name" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2"/>
                         <legend className="font-bold pt-2">Date of Birth</legend>
-                        <input required type="date" name="birthday" id="" placeholder="date of birth" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
+                        <input required type="date" name="date_of_birth" id="" placeholder="date of birth" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
                         <legend className="font-bold pt-2">City</legend>
                         <input required type="text" name="city" placeholder="city:where you live" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
                         <legend className="font-bold pt-2">Username</legend>
