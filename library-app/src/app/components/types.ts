@@ -15,6 +15,7 @@ export interface Book {
     number_of_ratings: number
     readers_currently_reading: number
     readers_finished_reading: number
+    want_to: number
     total_downloads: number
     total_shares: number
   }
