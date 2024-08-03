@@ -1,6 +1,45 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+
+const LOGIN_URL = "http://127.0.0.1:8000/api/token/pair"
 export default function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>, setUsername: React.Dispatch<React.SetStateAction<string>>, setPassword: React.Dispatch<React.SetStateAction<string>>) {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const formData = new FormData(form);
+        const objectFromForm = Object.fromEntries(formData);
+        const jsonData = JSON.stringify(objectFromForm);
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: jsonData
+        };
+    
+        try {
+            const response = await fetch(LOGIN_URL, requestOptions);
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                console.log("Logged in successfully");
+                setUsername('');
+                setPassword('');
+                // Handle successful login (e.g., save token, redirect user)
+            } else {
+                console.error("Login failed:", data);
+                // Handle login failure (e.g., show error message)
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+            // Handle network or other errors
+        }
+    }
     return (
         <main className="h-[100vh] flex flex-col justify-center">
             <section className="md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md shadow-md">
@@ -10,14 +49,13 @@ export default function Login() {
                     </h2>
                 </div>
                 <div className="md:w-1/2 flex flex-col items-center pb-3">
-                    <form action="" className="p-2">
-                        <legend className="font-bold pt-2">Email</legend>
-                        <input type="email" name="" id="" placeholder="Ex: johnDoe@gmail.com" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
-                        
+                    <form onSubmit={(event) => handleSubmit(event, setUsername, setPassword)} className="p-2">
+                        <legend className="font-bold pt-2">Username</legend>
+                        <input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} required id="" placeholder="Ex: johnDoe" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
                         <legend className="font-bold pt-2">Password</legend>
-                        <input type="password" name="" id="" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
+                        <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required id="" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
                         <br />
-                        <button type="submit" className="bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[17em] h-[2em] md:w-[25em] rounded-md font-mono border-solid border-2 border-black mt-2">Sign Up</button>
+                        <button type="submit" className="bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[17em] h-[2em] md:w-[25em] rounded-md font-mono border-solid border-2 border-black mt-2">Login</button>
                         <div className="flex mt-2 justify-between">
                             <div ><input type="checkbox" name="" id="" /> remember me</div>
                             <div>
