@@ -38,8 +38,8 @@ export default function Home() {
         <p className="p-3 md:pl-[5em] text-blue-700">Benefits of using let&apos;s learn</p>
         {/* tell the user about */}
         <div className="flex space-x-4 justify-center">
-          <button><Image src="/images/backward.png" alt="back icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></button>
-          <div className="flex bg-orange-400 bg-opacity-10 space-x-3 max-w-[18em]">
+          {/* <button><Image src="/images/backward.png" alt="back icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></button> */}
+          <div className="flex bg-orange-400 bg-opacity-10 p-8 space-x-3 max-w-[18em] h-[12em] border-2 border-black shadow-inner shadow-black">
             <div className="pt-6">
               <Image src="/images/goals.png" alt="goals icon" width={100} height={50}/>
             </div>
@@ -48,7 +48,7 @@ export default function Home() {
               <p className="font-extralight">With let&apos;s learn, you can set and monitor your personal learning goals</p>
             </div>
           </div>
-          <div className="hidden md:flex bg-orange-400 bg-opacity-10 space-x-3 max-w-[18em]">
+          <div className="hidden md:flex bg-orange-400 p-8 bg-opacity-10 space-x-3 max-w-[18em] border-2 border-black shadow-inner shadow-black">
             <div className="pt-6">
               <Image src="/images/goals.png" alt="goals icon" width={100} height={50}/>
             </div>
@@ -57,7 +57,7 @@ export default function Home() {
               <p className="font-extralight">With let&apos;s learn, you can set and monitor your personal learning goals</p>
             </div>
           </div>
-          <div className="hidden md:flex bg-orange-400 bg-opacity-10 space-x-3 max-w-[18em]">
+          <div className="hidden md:flex bg-orange-400 p-8 bg-opacity-10 space-x-3 max-w-[18em] border-2 border-black shadow-inner shadow-black">
             <div className="pt-6">
               <Image src="/images/goals.png" alt="goals icon" width={100} height={50}/>
             </div>
@@ -66,7 +66,7 @@ export default function Home() {
               <p className="font-extralight">With let&apos;s learn, you can set and monitor your personal learning goals</p>
             </div>
           </div>
-          <button><Image src="/images/forward.png" alt="forward icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></button>
+          {/* <button><Image src="/images/forward.png" alt="forward icon" className="pt-9 w-[2.5em] md:w-[3em]" width={70} height={30}/></button> */}
         </div>
       </section>
       {/* Genre Component Goes in here */}

@@ -69,7 +69,7 @@ export default function Login() {
             </div>
             <section className="md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md shadow-md">
                 <div className="hidden w-1/2 md:flex flex-col justify-center px-7 border-r-2 border-r-creamy-100">
-                    <p className="text-5xl">WELCOME <span className="text-orange-400">BACK!!</span></p>
+                    <p className="text-5xl font-title">WELCOME <span className="text-orange-400">BACK!!</span></p>
                     <h2 className="pt-2 text-xl font-light">Let&apos;s Learn, offers you a collection of it&apos;s digital library contents. <span className="font-description font-bold text-blue-900">Read</span> our eBook, <span className="font-description font-bold text-blue-900">Listen </span>to our audiobook collections even as you are empowered to seek knowledge for yourself.
                     </h2>
                 </div>
@@ -80,7 +80,7 @@ export default function Login() {
                         <legend className="font-bold pt-2">Password</legend>
                         <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required id="" className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2" />
                         <br />
-                        <button type="submit" className="bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[17em] h-[2em] md:w-[25em] rounded-md font-mono border-solid border-2 border-black mt-2">Login</button>
+                        <button type="submit" className="bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[17em] h-[2em] md:w-[25em] rounded-md font-mono border-solid border-2 border-black mt-2">Login to account</button>
                         <div className="flex mt-2 justify-between">
                             <div ><input type="checkbox" name="" id="" /> remember me</div>
                             <div>
