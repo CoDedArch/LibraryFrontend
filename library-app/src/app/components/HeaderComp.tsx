@@ -8,8 +8,9 @@ const AUTHENTICATED = "/api/authenticated";
 const LOGOUT_URL = "/api/logout";
 
 const HeaderComp: React.FC = () => {
-    const contribs = ["Add a Book"]
-    const browse_links = ["all books", "trending", "lists", "My Books"]
+    const contribs = ["Add a Book"];
+    const browse_links = ["all books", "trending", "lists", "My Books"];
+    const search_fields = ["title", "publisher", "year"];
     const [showmenu, setShowMenu] = useState(false);
     const [showBrowseMenu, setShowBrowseMenu] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState(false);
@@ -97,8 +98,13 @@ const HeaderComp: React.FC = () => {
             {/* this is the search bar */}
                 <div className={`${showSearchBar ? 'block' : 'hidden'} w-[15em] md:w-[20em] md:flex flex-row justify-between rounded-md border-r-2 border-orange-200`}>
                     <form action="">
-                    <select name="" id="" className="h-[2.8em] bg-orange-200 opacity-55 border-r-2 border-black rounded-l-md">
-                        <option value="">All</option>
+                    <select name="" id="" className=" max-w-[2.7em] h-[2.8em] bg-orange-200 opacity-55 border-r-2 border-black rounded-l-md">
+                            <option value="">All</option>
+                            {
+                                search_fields.map((field, field_index) => (
+                                    <option key={field_index} className="my-3 pt-2 hover:bg-creamy-100 border-b-2 hover:bg-opacity-60">{field}</option>
+                                ))
+                             }
                     </select>
                     <input type="text" placeholder="Search" className="pl-1 h-[2.6em] w-[9em] md:w-[14.3em] bg-orange-200 bg-opacity-20 text-black font-normal ml-1 border-r-2 border-black placeholder:text-black placeholder:font-light outline-none" />
                     </form>
