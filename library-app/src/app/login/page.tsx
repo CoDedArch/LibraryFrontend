@@ -5,7 +5,6 @@ import { useState } from "react";
 import { cookies } from "next/headers";
 import { useRouter } from "next/navigation";
 
-// const LOGIN_URL = "http://127.0.0.1:8000/api/token/pair"
 const LOGIN_URL = "/api/login"
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -17,8 +16,6 @@ export default function Login() {
     const error_styles = "bg-red-400 bg-opacity-50";
     const success_text = "Login Successfull";
     const error_text = "Sorry, incorrect username or password";
-
-    const router = useRouter()
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>, setUsername: React.Dispatch<React.SetStateAction<string>>, setPassword: React.Dispatch<React.SetStateAction<string>>) {
         event.preventDefault();
@@ -39,13 +36,13 @@ export default function Login() {
             const data = await response.json();
             console.log(data);
             if (response.ok) {
-                console.log("Logged int successfully");
+                console.log("Loggedin successfully");
                 setUsername('');
                 setPassword('');
                 setMessage(success_text);
                 setMessageStyle(success_styles);
                 setShowMessage(true);
-                setTimeout(() => setShowMessage(false), 3500);
+                setTimeout(() => setShowMessage(false), 2000);
                 window.location.href = '/';
                 // Handle successful login (e.g., save token, redirect user)
             } else {
