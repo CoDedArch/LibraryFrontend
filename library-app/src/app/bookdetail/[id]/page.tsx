@@ -5,16 +5,56 @@ import Image from "next/image";
 import { Book as BookType } from "@/app/components/types";
 import BookComp from "@/app/components/BookComp";
 
+
+const AUTHENTICATED = "/api/authenticated";
 export default function BookDetails({ params }: { params: {id:string} }) {
     const stars = Array.from({ length: 5 }, (_, index) => (
         <Image key={index} src="/images/star.svg" alt="star" width={30} height={30} />
     ));
 
+    const requires_login = "Hey There! to stream, download, share, rate, or ask question, you need to Log in";
+    const download_error = "Error in trying to download pdf";
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [setmessage, setShowMessage] = useState('');
     const [book, setBook] = useState<BookType | null>(null);
     const [authorBooks, setAuthorBooks] = useState<BookType[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
     const [booksPerPage, setBooksPerPage] = useState(2);
+
+
+    const downloadPdf = async (book_id: number) => {
+        try {
+            const response = await fetch(`/api/downloadpdf/${book_id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+    
+            if (!response.ok) {
+                setIsLoggedIn(false);
+                setShowMessage(download_error);
+                setTimeout(() => setIsLoggedIn(true), 7000);
+                throw new Error('Failed to download PDF');
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'book.pdf'; // You can set the filename dynamically if needed
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            setIsLoggedIn(false);
+            setShowMessage(requires_login);
+            setTimeout(() => setIsLoggedIn(true), 7000);
+        }
+
+    }
 
     const getBookFromDjangoAPI = async (id:string) => {
         const response = await fetch(`http://127.0.0.1:8000/api/books/${id}`);
@@ -27,6 +67,18 @@ export default function BookDetails({ params }: { params: {id:string} }) {
         return data;
     };
     useEffect(() => {
+        const checkUserIsAuthenticated = async () => {
+            const response = await fetch(AUTHENTICATED);
+            const data = await response.json();
+            if (response.ok) {
+                setIsLoggedIn(true);
+            } else {
+                setIsLoggedIn(false);
+                setShowMessage(requires_login);
+                setTimeout(() => setIsLoggedIn(true), 7000);
+            }
+        }
+        checkUserIsAuthenticated()
         if (params.id) {
             console.log(params.id);
             const fetchBook = async () => {
@@ -70,6 +122,9 @@ export default function BookDetails({ params }: { params: {id:string} }) {
     const selectedBooks = Array.isArray(authorBooks) ? authorBooks.slice(startIndex, startIndex + booksPerPage) : [];
     return (
         <main className="h-fit">
+             <div className={`absolute top-[23em] md:top-[10em] z-[20000] right-2 md:right-[10em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 bg-red-400 md:bg-opacity-50 ${isLoggedIn ? 'hidden' : 'block'}`}>
+                <p>{ setmessage }</p>
+            </div>
             <section className="relative mt-[3em] md:mt-0 md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md p-2">
                 <div className="relative top-[17em] md:static bg-blue-300 bg-opacity-10 p-2 md:w-1/5 flex flex-col items-center rounded-md border-r-2 border-2 border-black">
                     <div className="h-[13em] bg-blue-400 w-[10em]">
@@ -93,7 +148,7 @@ export default function BookDetails({ params }: { params: {id:string} }) {
                             <p className="flex justify-center"><Image src="/images/ask.png" alt="star" width={30} height={30} /></p>
                             <p>Inquire</p>
                         </div>
-                        <div>
+                        <div className="cursor-pointer" onClick={() => downloadPdf(book.id)}>
                             <p className="flex justify-center"><Image src="/images/download.png" alt="star" width={30} height={30} /></p>
                             <p>Download</p>
                         </div>
@@ -101,7 +156,6 @@ export default function BookDetails({ params }: { params: {id:string} }) {
                             <p className="flex justify-center"><Image src="/images/share.png" alt="star" width={30} height={30} /></p>
                             <p>Share</p>
                         </div>
-
                     </div>
                 </div>
                 <div className="relative -top-[31em] md:static w-full flex flex-col pb-3 pl-2">
