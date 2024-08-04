@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import {setToken,setRefreshToken} from '@/app/lib/auth'
 
-
 const Ninja_API_LOGIN_URL = "http://127.0.0.1:8000/api/token/pair"
 export async function POST(request) {
     const requestData = await request.json();
@@ -13,7 +12,6 @@ export async function POST(request) {
         },
         body: jsonData
     };
-
     try {
         const response = await fetch(Ninja_API_LOGIN_URL, requestOptions);
         const responseData = await response.json();
