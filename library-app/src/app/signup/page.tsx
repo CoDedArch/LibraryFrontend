@@ -2,15 +2,17 @@
 import { headers } from "next/headers";
 import Image from "next/image";
 import { useState } from "react";
+import { useAuth } from "@/components/authProvider";
 
 const SIGNUP_URL = "http://127.0.0.1:8000/api/user/create_reader"
 export default function Signup() {
+    const auth = useAuth();
     const [message, setMessage] = useState('');
     const [messageStyle, setMessageStyle] = useState('');
     const [showMessage, setShowMessage] = useState(false);
     const success_styles = "bg-green-500 bg-opacity-30";
     const error_styles = "bg-red-400 bg-opacity-50";
-    const success_text = "Account Created ...";
+    const success_text = "Join ...";
     const error_text = "Account Creation Failed";
     const login_failed_text = "Auto Loging in Failed!";
 
@@ -35,6 +37,9 @@ export default function Signup() {
                 username: objectFromForm.username,
                 password: objectFromForm.password
             };
+            setMessage(success_text);
+            setMessageStyle(success_styles);
+            setShowMessage(true)
             const loginResponse = await fetch('/api/login', {
                 method: "POST",
                 headers: {
@@ -42,13 +47,17 @@ export default function Signup() {
                 },
                 body: JSON.stringify(loginData)
             });
-            setMessage(success_text);
-            setMessageStyle(success_styles);
             const loginResult = await loginResponse.json();
             if (loginResponse.ok) {
-                setShowMessage(true);
-                setTimeout(() => setShowMessage(false), 2000);
-                window.location.href = '/';
+                try {
+                    auth?.login();
+                    setShowMessage(true);
+                    setTimeout(() => setShowMessage(false), 2000);
+                    window.location.href = '/';    
+                } catch(error) {
+                    console.log("Error");
+                }
+                
                 // Redirect or update UI as needed
             } else {
                 setMessage(login_failed_text);
