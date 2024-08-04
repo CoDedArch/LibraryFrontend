@@ -1,20 +1,19 @@
+import { useAuth } from "@/components/authProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
-
-const AUTHENTICATED = "/api/authenticated";
 const LOGOUT_URL = "/api/logout";
 
 const HeaderComp: React.FC = () => {
+    const auth = useAuth();
     const contribs = ["Add a Book"];
     const browse_links = ["all books", "trending", "lists", "My Books"];
     const search_fields = ["title", "publisher", "year"];
     const [showmenu, setShowMenu] = useState(false);
     const [showBrowseMenu, setShowBrowseMenu] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     const router = useRouter();
@@ -29,16 +28,6 @@ const HeaderComp: React.FC = () => {
         setShowSearchBar(window.innerWidth < 640 ? !showSearchBar : false);
     };
     useEffect(() => {
-        const checkUserIsAuthenticated = async () => {
-            const response = await fetch(AUTHENTICATED);
-            const data = await response.json();
-            if (response.ok) {
-                setIsLoggedIn(true);
-            } else {
-                setIsLoggedIn(false);
-            }
-        }
-        checkUserIsAuthenticated();
         const handleClickOutside = (event: MouseEvent) => {
           if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
             setShowMenu(false);
@@ -55,13 +44,11 @@ const HeaderComp: React.FC = () => {
             },
             body: ""
         };
-    
-        
         const response = await fetch(LOGOUT_URL, requestOptions);
         const data = await response.json();
         if (response.ok) {
+            auth?.logout()
             router.replace("/");
-            setIsLoggedIn(false);
         }
     }
 
@@ -82,7 +69,7 @@ const HeaderComp: React.FC = () => {
             </p>
             </div>
             <div className="flex md:space-x-2">
-                <button onClick={browseMenu} className={`flex flex-row absolute ${isLoggedIn ? 'top-[4.3em] right-[2em]' : 'top-[3.4em] right-[2em]'} md:static md:p-2`}>
+                <button onClick={browseMenu} className={`flex flex-row absolute ${auth?.isAuthenticated ? 'top-[4.3em] right-[2em]' : 'top-[3.4em] right-[2em]'} md:static md:p-2`}>
                     <p className="font-extralight font-mono w-fit text-2xl">Browse</p> 
                     <div className="p-3 pl-[2px] w-[2em]">
                         { 
@@ -113,17 +100,17 @@ const HeaderComp: React.FC = () => {
                     </div>
                 </div>
                 <div className="relative md:-left-28 p-3">
-                    <Image src="/images/search.png" alt="search icon" onClick={handleSearchIconClick} className="w-[1.4em] cursor-pointer" width={40} height={50}/>
+                    <Image src="/images/search.png" alt="search icon" onClick={handleSearchIconClick} className="w-[1.4em] cursor-pointer" width={40} height={50} />
                 </div>
                 { 
-                    isLoggedIn ? (
+                    auth?.isAuthenticated ? (
                         <button onClick={handleLogout} className="hidden sm:block right-[18em] text-center hover:bg-red-400 hover:text-white hover:border-black transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-red-400 mt-1">Log out</button>
                     ) : (
                         <Link href="/login" className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono">Log in</Link>           
                     )
                 }
                 { 
-                    isLoggedIn ? (
+                    auth?.isAuthenticated ? (
                         <div className="pt-2 font-extralight underline">
                             <Image src="/images/acct.png" className="w-[2em] cursor-pointer" title="View Account" alt="profile" width={70} height={30} />
                         </div>           
@@ -131,7 +118,7 @@ const HeaderComp: React.FC = () => {
                             <Link href="/signup" className={`${showSearchBar ? 'hidden' : 'block' } text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1`}>JOIN</Link>                    
                     )  
                 }    
-            <button className={`p-2 ${isLoggedIn ? 'absolute md:static':'static'} top-[4em] right-1`} onClick={renderMenu} title="Pop Up Menu">
+            <button className={`p-2 ${auth?.isAuthenticated ? 'absolute md:static':'static'} top-[4em] right-1`} onClick={renderMenu} title="Pop Up Menu">
                 <Image src="/images/menu.png" alt="menu button" width={30} height={50} />
             </button>
             { 
@@ -142,14 +129,14 @@ const HeaderComp: React.FC = () => {
                             <p className="text-center border-b-2 border-b-yellow-800 font-description">my Let&apos;s learn</p>
                             <div className="flex space-x-2 md:space-x-3 py-2">
                             {
-                                isLoggedIn ? (
+                                auth?.isAuthenticated ? (
                                     <button onClick={handleLogout} className="text-center hover:bg-red-400 hover:text-white hover:border-black transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-red-400 mt-1">Log out</button>
                                 ) : (
                                     <Link href="/login" className="text-center pt-1 bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">log in</Link>          
                                 )         
                             }
                             { 
-                                isLoggedIn ? (
+                                auth?.isAuthenticated ? (
                                     <div className="pt-2 font-extralight underline">View Profile</div>           
                                 ) : (
                                     <Link href="/signup" className="text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1">JOIN</Link>                    
