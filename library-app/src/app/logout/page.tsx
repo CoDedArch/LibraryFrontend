@@ -4,10 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { cookies } from "next/headers";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/authProvider";
+
 
 // const LOGIN_URL = "http://127.0.0.1:8000/api/token/pair"
 const LOGOUT_URL = "/api/logout";
 export default function Logout() {
+    const auth = useAuth();
     const router = useRouter()
     async function handleLogout(event: React.MouseEvent<HTMLButtonElement>) {
         const requestOptions = {
@@ -24,6 +27,7 @@ export default function Logout() {
     console.log(data);
     if (response.ok) {
         console.log("Logged out");
+        auth?.logout();
         router.replace("/login");
     }
         

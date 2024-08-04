@@ -1,12 +1,13 @@
 "use client"
+import { useAuth } from "@/components/authProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { cookies } from "next/headers";
-import { useRouter } from "next/navigation";
 
 const LOGIN_URL = "/api/login"
 export default function Login() {
+    const auth = useAuth();
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -37,6 +38,7 @@ export default function Login() {
             console.log(data);
             if (response.ok) {
                 console.log("Loggedin successfully");
+                auth?.login();
                 setUsername('');
                 setPassword('');
                 setMessage(success_text);
