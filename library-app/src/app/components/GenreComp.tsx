@@ -8,17 +8,16 @@ import Image from 'next/image';
 interface GenreProps {
   genre: Genre;
 }
-
 const GenreCompo: React.FC<GenreProps> = ({ genre }) => {
     const [books, setBooks] = useState<Book[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
+    // manage the books to display per page
     const [booksPerPage, setBooksPerPage] = useState(2);
-
     useEffect(() => {
         const updateBooksPerPage = () => {
             setBooksPerPage(window.innerWidth < 640 ? 2 : 5);
         };
-
+    //  fetch all the books in the database related to a particular genre
         const fetchBooks = async () => {
           const response = await fetch(`http://127.0.0.1:8000/api/books/books/genre/${genre.id}`);
           const data = await response.json();
@@ -26,20 +25,21 @@ const GenreCompo: React.FC<GenreProps> = ({ genre }) => {
         };
         updateBooksPerPage(); // Set initial value
         window.addEventListener('resize', updateBooksPerPage);
-
         fetchBooks();
         return () => window.removeEventListener('resize', updateBooksPerPage);
     }, [genre.id]);
+    
     const totalPages = Math.ceil(books.length / booksPerPage);
+    
     const handleNext = () => {
         setCurrentPage((prevPage) => (prevPage + 1) % totalPages);};
     
     const handlePrev = () => {
         setCurrentPage((prevPage) => (prevPage - 1 + totalPages) % totalPages);
       };
+    
     const startIndex = currentPage * booksPerPage;
     const selectedBooks = books.slice(startIndex, startIndex + booksPerPage);
-    
     return (
         <section key={genre.id} className="mt-[3em]">
             <p className="p-2 font-title text-2xl">{genre.genre}</p>

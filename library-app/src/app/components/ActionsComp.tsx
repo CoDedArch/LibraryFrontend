@@ -14,12 +14,15 @@ interface ActionsProps {
     alt: string;
 }
 const ActionsComp: React.FC<ActionsProps> = ({book, img, action, alt}) => {
-    const auth = useAuth();
-    const [showPrompt, setShowPrompt] = useState(false);
-    const [message, setShowMessage] = useState('');
     const requires_login = "Hey There! to stream, download, share, rate, or ask question, you need to Log in";
     const download_error = "Error in trying to download pdf";
 
+    // 
+    const auth = useAuth();
+    // manage the state of when to prompt a user and the message to show
+    const [showPrompt, setShowPrompt] = useState(false);
+    const [message, setShowMessage] = useState('');
+    
     const showMessagePrompt = (prompt: string) => {
         setShowPrompt(true);
         setShowMessage(prompt);
@@ -27,7 +30,6 @@ const ActionsComp: React.FC<ActionsProps> = ({book, img, action, alt}) => {
             setShowPrompt(false);
         }, 5000);
     };
-
 
     const downloadPdf = async (book_id: number) => {
         try {
@@ -53,22 +55,23 @@ const ActionsComp: React.FC<ActionsProps> = ({book, img, action, alt}) => {
         } catch (error) {
             showMessagePrompt("Ninja Server Error")
         }
-
     }
     return (
     <>
         <div className={`absolute top-[23em] md:top-[10em] z-[20000] right-2 md:right-[10em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 bg-red-400 md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
                 <p>{ message }</p>
         </div>
-        <div className={`${auth?.isAuthenticated ? 'cursor-pointer' : 'opacity-25 cursor-not-allowed'}`} onClick={() => {
-
-            if (auth?.isAuthenticated) {
-                downloadPdf(book.id);        
-            } else {
-                showMessagePrompt(requires_login);
-            }
-            }}>
-            <p className="flex justify-center"><Image src={`/images/${img}`} alt="star" width={30} height={30} /></p>
+            <div className={`${auth?.isAuthenticated ? 'cursor-pointer' : 'opacity-25 cursor-not-allowed'}`}
+                onClick={() => {
+                    if (auth?.isAuthenticated) {
+                        downloadPdf(book.id);        
+                    } else {
+                        showMessagePrompt(requires_login);
+                    }
+                }}>
+                <p className="flex justify-center">
+                    <Image src={`/images/${img}`} alt="star" width={30} height={30} />
+                </p>
             <p>{ action }</p>
         </div>
     </>
