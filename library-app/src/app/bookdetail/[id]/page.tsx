@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Book as BookType } from "@/app/components/types";
 import LeftBookComp from "@/app/components/LeftBookComp";
 import RightBookComp from "@/app/components/RightBookComp";

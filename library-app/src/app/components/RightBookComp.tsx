@@ -20,11 +20,6 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
     const [authorBooks, setAuthorBooks] = useState<BookType[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const actions = [
-        { "img": "ask.png", "action": "Inquire", "alt":"ask question"},
-        { "img": "download.png", "action": "Download", "alt": "download" },
-        {"img": "share.png", "action": "Share", "alt": "share"}
-    ]
     const access = [
         "publication_date", "publisher", "no_pages"
     ]
@@ -81,8 +76,10 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
   return (
     <div className="relative -top-[31em] md:static w-full flex flex-col pb-3 pl-2">
     <BookHeaderComp></BookHeaderComp>
-    <BookTitleComp book={book}></BookTitleComp>
-    <StatsComp book={book}></StatsComp>
+    <div id="Overview">
+        <BookTitleComp book={book}></BookTitleComp>
+        <StatsComp book={book}></StatsComp> 
+    </div>
     {/* Displays Some Info about the Book */}
     <div className="mt-[2em]">
         <ul className="flex space-x-3 justify-center">
@@ -97,7 +94,7 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
         </ul>
     </div>
     {/* This section displays the details of a book */}
-    <div className="mt-[1em]">
+    <div className="mt-[1em]" id="Details">
         <p className="p-4 text-2xl border-b-2 border-b-black">Book Details</p>
         <p className="pl-4 font-title text-lg">edition notes</p>
         <p className="pl-7 font-title text-lg">Source Title:<span className="italic font-bold"> {book.title}</span> ({book.publication_date})</p>
@@ -110,7 +107,7 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
         <p className="pl-7">ISBN 13:<span className="font-bold ml-7">{book.isbn13}</span> </p>
     </div>
     {/* This Section displays the Books related to an Author */}
-    <div className="mt-[2em]">
+    <div className="mt-[2em]" id="Related">
         <p className="font-light text-2xl">More Books by this Author</p>
         <div className="flex space-x-2 md:space-x-10 justify-center mt-[2em]">
             {/* More books from the author */}

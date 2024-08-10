@@ -39,13 +39,19 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
     </div>
     <div className={`flex space-x-3 mt-[2em]`}>
     {actions.map((actionItem, index) => (
-        <ActionsComp
-            key={index}
-            img={actionItem.img}
-            action={actionItem.action}
-            alt={actionItem.alt}
-            book={book}
-            />
+        <div key={index} className='relative'>
+            {
+               book.total_downloads >= 1 ? <div className={`bg-green-200 shadow-md font-bold ${index === 1 ? 'block' : 'hidden'} absolute h-8 w-8 text-center pt-1 border-1 border-black rounded-full left-7 -top-8`}>{book.total_downloads}</div> : ''          
+            }
+            <ActionsComp
+                key={index}
+                img={actionItem.img}
+                action={actionItem.action}
+                alt={actionItem.alt}
+                book={book}
+                />
+
+        </div>
         ))}
     </div>
 </div>

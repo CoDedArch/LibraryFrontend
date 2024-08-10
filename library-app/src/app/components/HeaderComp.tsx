@@ -54,6 +54,7 @@ const HeaderComp: React.FC = () => {
 
     return (
         <header className="flex flex-row justify-between p-2 text-lg md:pr-[9em]">
+            {/* Browsing links to help users navigate to various sections */}
             <ul className={`${showBrowseMenu ? 'block':'hidden'} absolute top-[6.4em] right-3 md:top-[3.4em] md:left-[32em] z-[10000] bg-orange-200 md:bg-opacity-80 rounded-md w-[10em]`}>
                 {
                     browse_links.map((link, link_index) => (
@@ -61,14 +62,17 @@ const HeaderComp: React.FC = () => {
                     ))
                 }
             </ul>
-            <div className="p-2 font-extrabold text-2xl flex space-x-6">
+
             {/* This contains the Logo and the Name of the application */}
+            <div className="p-2 font-extrabold text-2xl flex space-x-6">
             <Link href="/" className={`${showSearchBar ? 'hidden' : 'block'}`}>Let&lsquo;s Learn</Link>
             <p className="absolute top-[2.4em] md:static font-extralight text-2xl md:text-lg p-1 md:bg-orange-200 bg-opacity-25 hover:bg-opacity-10 transition-opacity">
                 <a href="http://" className=" hover:text-orange-300 transition-colors">My Books</a>
             </p>
             </div>
+            {/* This contains the search bar and menu icon as well as user profile and login, logout */}
             <div className="flex md:space-x-2">
+
                 <button onClick={browseMenu} className={`flex flex-row absolute ${auth?.isAuthenticated ? 'top-[4.3em] right-[2em]' : 'top-[3.4em] right-[2em]'} md:static md:p-2`}>
                     <p className="font-extralight font-mono w-fit text-2xl">Browse</p> 
                     <div className="p-3 pl-[2px] w-[2em]">
@@ -82,6 +86,7 @@ const HeaderComp: React.FC = () => {
                         }
                     </div>
                 </button>
+
             {/* this is the search bar */}
                 <div className={`${showSearchBar ? 'block' : 'hidden'} w-[15em] md:w-[20em] md:flex flex-row justify-between rounded-md border-r-2 border-orange-200`}>
                     <form action="">
@@ -99,9 +104,11 @@ const HeaderComp: React.FC = () => {
                     <Image src="/images/barcode.png" alt="barcode reader" className="cursor-pointer" width={30} height={50}/>
                     </div>
                 </div>
+                {/* search icon */}
                 <div className="relative md:-left-28 p-3">
                     <Image src="/images/search.png" alt="search icon" onClick={handleSearchIconClick} className="w-[1.4em] cursor-pointer" width={40} height={50} />
                 </div>
+                {/* show the logout if a user is authenticate else, login */}
                 { 
                     auth?.isAuthenticated ? (
                         <button onClick={handleLogout} className="hidden sm:block right-[18em] text-center hover:bg-red-400 hover:text-white hover:border-black transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-red-400 mt-1">Log out</button>
@@ -109,6 +116,7 @@ const HeaderComp: React.FC = () => {
                         <Link href="/login" className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono">Log in</Link>           
                     )
                 }
+                {/* also show the user profile if the user is authenticated */}
                 { 
                     auth?.isAuthenticated ? (
                         <div className="pt-2 font-extralight underline">
@@ -117,7 +125,8 @@ const HeaderComp: React.FC = () => {
                     ) : (
                             <Link href="/signup" className={`${showSearchBar ? 'hidden' : 'block' } text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1`}>JOIN</Link>                    
                     )  
-                }    
+                }
+                {/* menu icon */}
             <button className={`p-2 ${auth?.isAuthenticated ? 'absolute md:static':'static'} top-[4em] right-1`} onClick={renderMenu} title="Pop Up Menu">
                 <Image src="/images/menu.png" alt="menu button" width={30} height={50} />
             </button>
