@@ -46,7 +46,6 @@ export default function BookDetails({ params }: { params: { id: string } }) {
     return (
         <main className="h-fit">
             <section className="relative mt-[3em] md:mt-0 md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md p-2">
-                
                 <LeftBookComp book={book}></LeftBookComp>
                 <RightBookComp book={book} publisher=
                     {book.publisher}>
