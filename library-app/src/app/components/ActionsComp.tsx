@@ -58,7 +58,7 @@ const ActionsComp: React.FC<ActionsProps> = ({book, img, action, alt}) => {
     }
     return (
     <>
-        <div className={`absolute top-[23em] md:top-[10em] z-[20000] right-2 md:right-[10em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 bg-red-400 md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
+        <div className={`absolute top-[23em] md:top-[4em] z-[20000] right-2 md:-right-[5em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 shadow-md bg-red-400 md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
                 <p>{ message }</p>
         </div>
             <div className={`${auth?.isAuthenticated ? 'cursor-pointer' : 'opacity-25 cursor-not-allowed'}`}
