@@ -3,14 +3,28 @@ import React from 'react';
 import Image from 'next/image';
 import { Book as BookType } from './types';
 import ActionsComp from './ActionsComp';
+import { useState } from 'react';
 
 interface BookProps {
     book: BookType;
 }
 
 const LeftBookComp: React.FC<BookProps> = ({ book }) => {
+    const [selectedRating, setSelectedRating] = useState(0);
+
+    const handleStarHover = (rating:number) => {
+        setSelectedRating(rating);
+    };
+
+    const handleStarClick = (rating:number) => {
+    // Handle saving the rating (e.g., send to the server)
+        console.log(`User selected rating: ${rating}`);
+        setSelectedRating(rating);
+    };
+
     const stars = Array.from({ length: 5 }, (_, index) => (
-        <Image key={index} src="/images/star.svg" alt="star" width={30} height={30} />
+        <svg key={index} xmlns="http://www.w3.org/2000/svg" fill={index < selectedRating ? 'green' : '#000000'} style={{cursor: 'pointer'}} width="21.87" height="20.801"><path d="m4.178 20.801 6.758-4.91 6.756 4.91-2.58-7.946 6.758-4.91h-8.352L10.936 0 8.354 7.945H0l6.758 4.91-2.58 7.946z" onMouseEnter={() => handleStarHover(index + 1)}
+        onClick={() => handleStarClick(index + 1)}/></svg>
     ));
 
     const actions = [
@@ -25,10 +39,10 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
         <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={1190} height={30}/>
     </div>
     <p className="font-serif mt-2">Genre: <span className="font-bold font-description">&lt;Fictional&gt;</span></p>
-    <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg">
+    <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold">
         Stream
     </button>
-    <form action="" className="bg-slate-400 bg-opacity-50 hover:cursor-pointer w-[9em] h-[2.5em] flex justify-between mt-1 rounded-md text-lg">
+    <form action="" className="bg-slate-400 hover:bg-slate-700 hover:text-yellow-50 hover:transition-all shadow-md bg-opacity-50 hover:cursor-pointer w-[9em] h-[2.5em] flex justify-between mt-1 rounded-md text-lg">
         <span className="p-1 pl-5">want to learn</span>
         <select name="" id="" className="h-full">
 
@@ -39,9 +53,9 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
     </div>
     <div className={`flex space-x-3 mt-[2em]`}>
     {actions.map((actionItem, index) => (
-        <div key={index} className='relative'>
+        <div key={index}>
             {
-               book.total_downloads >= 1 ? <div className={`bg-green-200 shadow-md font-bold ${index === 1 ? 'block' : 'hidden'} absolute h-8 w-8 text-center pt-1 border-1 border-black rounded-full left-7 -top-8`}>{book.total_downloads}</div> : ''          
+               book.total_downloads >= 1 ? <div className={`bg-green-200 shadow-md font-bold ${index === 1 ? 'block' : 'hidden'} absolute h-8 w-8 text-center pt-1 border-1 border-black rounded-full md:left-28 left-[11em] top-[25em] z-[1000] md:top-[25.4em]`}>{book.total_downloads}</div> : ''          
             }
             <ActionsComp
                 key={index}
