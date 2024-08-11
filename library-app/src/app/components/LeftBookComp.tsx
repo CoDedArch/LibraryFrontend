@@ -1,22 +1,54 @@
+"use client"
+
 // components/BookComp.tsx
 import React from 'react';
 import Image from 'next/image';
 import { Book as BookType } from './types';
 import ActionsComp from './ActionsComp';
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { useAuth } from '@/components/authProvider';
+import { useRouter } from 'next/router';
 
 interface BookProps {
     book: BookType;
 }
 
 const LeftBookComp: React.FC<BookProps> = ({ book }) => {
-    const auth = useAuth()
+    const auth = useAuth();
     const [showPrompt, setShowPrompt] = useState(false);
     const [rated, setIsRated] = useState(false);
-    const [message, setShowMessage] = useState('');
     const [selectedRating, setSelectedRating] = useState(0);
+    const [message, setShowMessage] = useState('');
 
+    useEffect(() => {
+        if (auth?.isAuthenticated) {
+            fetchUserRating(book.id);
+        }
+    }, [auth?.isAuthenticated, book.id])
+    
+    const fetchUserRating = async (book_id:number) => {
+        const user_rating_url = `/api/userrating/${book_id}`
+        const get_options = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }
+        try {
+            const response = await fetch(user_rating_url, get_options)
+            const responseData = await response.json()
+            console.log(responseData)
+            if (response.ok) {
+                const userRatingValue = responseData.user_rating.user_ratings[0].value;
+                setIsRated(true)
+                setSelectedRating(userRatingValue)
+            }
+            else { console.log("It doesn't work") }
+        }
+        catch (error) {
+            console.log("ERROR")
+        }
+    }
     const handleStarHover = (rating:number) => {
         setSelectedRating(rating);
     };
@@ -54,6 +86,7 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
                 setTimeout(() => {
                     setShowPrompt(false);
                 }, 5000)
+                window.location.reload()
             }
             else {
                 setIsRated(false);
@@ -117,7 +150,10 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
                 book.total_downloads >= 1 ? <div className={`bg-green-200 shadow-md font-bold ${index === 1 ? 'block' : 'hidden'} absolute h-8 w-8 text-center pt-1 border-1 border-black rounded-full md:left-28 left-[11em] top-[25em] z-[1000] md:top-[25.4em]`}>{book.total_downloads}</div> : ''          
                 }
                 <ActionsComp
-                    key={index}
+                    key={index
+
+                        
+                    }
                     img={actionItem.img}
                     action={actionItem.action}
                     alt={actionItem.alt}
