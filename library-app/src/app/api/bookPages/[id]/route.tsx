@@ -22,7 +22,7 @@ export async function GET(request: Request, { params }: { params: { id: number }
     const book_pages = await response.json()
     console.log(book_pages)
     if (response.ok) {
-        return NextResponse.json({message:"Pages have been successfully returned"}, {status:200})
+        return NextResponse.json({pages: book_pages.pages}, {status:200})
     }
     else {
         return NextResponse.json({message:"You are not logged in"}, {status:404})
