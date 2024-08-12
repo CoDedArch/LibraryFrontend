@@ -7,6 +7,7 @@ import { Book as BookType } from './types';
 import ActionsComp from './ActionsComp';
 import { useState, useEffect} from 'react';
 import { useAuth } from '@/components/authProvider';
+import next from 'next';
 
 interface BookProps {
     book: BookType;
@@ -16,14 +17,28 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
     const auth = useAuth();
     const [showPrompt, setShowPrompt] = useState(false);
     const [rated, setIsRated] = useState(false);
-    const [error, setError] = useState(true);
+    const [error, setError] = useState(false);
     const [selectedRating, setSelectedRating] = useState(0);
-    const [bookpages, setbookpages] = useState([])
+    const [bookpages, setbookpages] = useState([]);
+    const [currentpage, setCurrentPage] = useState(0);
+    const [nextPage, setNextPage] = useState(1);
+    const [previousPage, setPrevious] = useState(-1);
     const [message, setShowMessage] = useState('');
     const [streamingMode, setStreamingMode] = useState(false);
 
+    const moveNextPage = () => {
+        setCurrentPage(nextPage);
+        setNextPage(nextPage + 1);
+        setPrevious(nextPage - 1);
+        console.log(`previous is ${currentpage}`)
+    }
+    const movePrevPage = () => {
+        setCurrentPage(previousPage);
+        setNextPage(previousPage + 1);
+        setPrevious(previousPage - 1);
+    }
+
     const handleBookStreaming = async () => {
-        setStreamingMode(true)
         const url_to_pages_route = "/api/bookPages/"
         const options = {
             methods: "GET",
@@ -35,11 +50,13 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
             const response = await fetch(`${url_to_pages_route}${book.id}`, options)
             const routeData = await response.json()
             if (response.ok) {
-                setbookpages(routeData.pages)
+                setbookpages(routeData.pages);
+                setStreamingMode(true);
             }
             else {
+                setError(true);
                 setShowPrompt(true);
-                setShowMessage(routeData.message)
+                setShowMessage(routeData.message);
                 setTimeout(() => {
                 setShowPrompt(false);
                 }, 5000)
@@ -47,7 +64,7 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
         }
         catch (error) {
             setShowPrompt(true);
-            setError(false);
+            setError(true);
             setShowMessage("Internal Server Error, try checking after sometime")
             setTimeout(() => {
                 setShowPrompt(false);
@@ -157,33 +174,48 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
 
     return (
     <>
-    <div className={`absolute top-[23em] md:top-[4em] z-[20000] right-2 md:-right-[5em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 shadow-md ${rated && error? 'bg-green-500' :'bg-red-400'} md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
+    <div className={`absolute top-[23em] md:top-[4em] z-[20000] right-2 md:-right-[5em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 shadow-md ${rated && !error? 'bg-green-500' :'bg-red-400'} md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
         <p>{ message }</p>
     </div>
             
-    {streamingMode && <section className='bg-slate-800 bg-opacity-70 absolute -top-[4em] w-[94.6em] h-[100vh] z-[30000] flex flex-col justify-center items-center -left-[7em]'>
-        <div className='absolute top-[1em] right-[5em] justify-end space-x-3 w-[10em] h-10 flex'>
-            <Image src="/images/settings.png" className="w-[2em]" alt={book.title} width={7190} height={6660}/>
+            {(streamingMode && !error) ? <section className={`bg-slate-800 bg-opacity-70 absolute -top-[4em] w-[94.6em] ${currentpage === 0 ? 'h-[100vh]' : 'h-fit'} z-[30000] flex flex-col justify-center items-center -left-[7em]`}>
+        <div className='absolute top-[1em] right-[5em] justify-end space-x-10 w-[10em] h-10 flex'>
+            <div className='bg-yellow-200 pb-5 relative'>
+            <svg xmlns="http://www.w3.org/2000/svg" className='w-[2em] absolute -top-3 -left-5' x="0px" y="0px" width="64" height="64" viewBox="0 0 512 512"> <path fill="#32BEA6" d="M504.1,256C504.1,119,393,7.9,256,7.9C119,7.9,7.9,119,7.9,256C7.9,393,119,504.1,256,504.1C393,504.1,504.1,393,504.1,256z"></path><path fill="#FFF" d="M416.2,275.3v-38.6l-36.6-11.5c-3.1-12.4-8-24.1-14.5-34.8l17.8-34.1L355.6,129l-34.2,17.8c-10.6-6.4-22.2-11.2-34.6-14.3l-11.6-36.8h-38.7l-11.6,36.8c-12.3,3.1-24,7.9-34.6,14.3L156.4,129L129,156.4l17.8,34.1c-6.4,10.7-11.4,22.3-14.5,34.8l-36.6,11.5v38.6l36.4,11.5c3.1,12.5,8,24.3,14.5,35.1L129,355.6l27.3,27.3l33.7-17.6c10.8,6.5,22.7,11.5,35.3,14.6l11.4,36.2h38.7l11.4-36.2c12.6-3.1,24.4-8.1,35.3-14.6l33.7,17.6l27.3-27.3l-17.6-33.8c6.5-10.8,11.4-22.6,14.5-35.1L416.2,275.3z M256,340.8c-46.7,0-84.6-37.9-84.6-84.6c0-46.7,37.9-84.6,84.6-84.6c46.7,0,84.5,37.9,84.5,84.6C340.5,303,302.7,340.8,256,340.8z"></path> </svg>            
+            </div>
             <Image src="/images/close.png" onClick={() => {setStreamingMode(false)}} className="w-[2em] cursor-pointer" alt={book.title} width={7190} height={6660}/>
         </div>            
         {/*cover page  */}
-        <div className='bg-blue-400 h-[40em] w-[26em] trasnform border-2 shadow-2xl shadow-green-500 border-black'>
-            <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={7190} height={6660}/>
+                <div className={`bg-yellow-100  ${currentpage === 0 ? 'w-[26em] h-[40em]': 'w-[40em] h-fit'} trasnform border-2 shadow-2xl shadow-green-500 border-black`}>
+                    {currentpage === 0 ? <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={7190} height={6660} /> :
+                        (<>
+                            <p className='text-center font-bold border-b-4 border-b-black'>Current page { currentpage }</p>
+                            <p className='p-2'>{bookpages[currentpage-1]}</p>
+                        </>
+                        )}
         </div>
-        <div className='bg-yellow-100 absolute right-[10em] top-[5em] w-[20em] h-[30em]'>
-            <p className='text-center p-2 border-b-4 border-black font-bold'>Next page</p>            
+                <div className={`bg-yellow-100 absolute opacity-70 ${currentpage === 0 ? 'right-[10em]': 'right-[7em]'} top-[5em] w-[20em] h-[30em]`}>
+                    <p className='text-center p-2 border-b-4 border-black font-bold'>Next page {nextPage}</p>
+            <div className='bg-slate-300 text-[10px]'>
+                        {bookpages[nextPage-1]}
+            </div>        
         </div>
-        <div className='bg-yellow-100 absolute left-[10em] top-[5em] w-[20em] h-[30em]'>
-            <p className='text-center p-2 border-b-4 border-black font-bold'>Previous page</p>            
-        </div>
-    </section>}        
+        {previousPage > -1  && <div className={`bg-yellow-100 absolute opacity-70 ${currentpage === 0 ? 'left-[10em]': 'left-[7em]'} top-[5em] w-[20em] h-[30em]`}>
+                    <p className='text-center p-2 border-b-4 border-black font-bold'>{previousPage === 0 ? 'cover page' : `Previous page ${ previousPage }`}</p>
+            <p className='text-[10px] bg-slate-300'> {previousPage === 0 ? <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={7190} height={6660} /> : bookpages[previousPage-1]}</p>        
+        </div>}
+        <Image src="/images/forward.png" className="w-[3em] absolute right-10 shadow-xl shadow-green-500 cursor-pointer hover:shadow-2xl hover:shadow-green-500" alt={book.title} width={7190} height={6660} onClick={moveNextPage} />
+        <Image src="/images/backward.png" className="w-[3em] absolute left-10 shadow-xl shadow-red-500 cursor-pointer hover:shadow-2xl hover:shadow-red-500" alt={book.title} width={7190} height={6660} onClick={movePrevPage}/>
+                
+        </section>: ''
+    }        
 
     <div className="relative top-[17em] md:static bg-blue-300 bg-opacity-10 p-2 md:w-1/5 flex flex-col items-center rounded-md border-r-2 border-2 border-black">
         <div className="h-[13em] bg-blue-400 w-[10em]">
             <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={1190} height={30}/>
         </div>
         <p className="font-serif mt-2">Genre: <span className="font-bold font-description">&lt;Fictional&gt;</span></p>
-        <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold" onClick={handleBookStreaming}>
+        <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold" onClick={ handleBookStreaming }>
             Stream
         </button>
         <form action="" className="bg-slate-400 hover:bg-slate-700 hover:text-yellow-50 hover:transition-all shadow-md bg-opacity-50 hover:cursor-pointer w-[9em] h-[2.5em] flex justify-between mt-1 rounded-md text-lg">

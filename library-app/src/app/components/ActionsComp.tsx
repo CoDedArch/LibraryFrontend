@@ -2,7 +2,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { Book as BookType } from './types';
-import Link from 'next/link';
 import { useAuth } from '@/components/authProvider';
 import { useState } from 'react';
 
@@ -14,10 +13,9 @@ interface ActionsProps {
     alt: string;
 }
 const ActionsComp: React.FC<ActionsProps> = ({book, img, action, alt}) => {
-    const requires_login = "Hey There! to stream, download, share, rate, or ask question, you need to Log in";
-    const download_error = "Error in trying to download pdf";
+    const requires_login = "Hi There! to stream, download, share, rate, or ask question, you need to Log in";
 
-    // 
+    // get the user authentication status
     const auth = useAuth();
     // manage the state of when to prompt a user and the message to show
     const [showPrompt, setShowPrompt] = useState(false);
@@ -42,7 +40,7 @@ const ActionsComp: React.FC<ActionsProps> = ({book, img, action, alt}) => {
             if (!response.ok) {
                 showMessagePrompt(requires_login);
                 throw new Error('Failed to download PDF');
-            }         
+            }        
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
