@@ -1,13 +1,12 @@
 "use client"
 
 // components/BookComp.tsx
-import React from 'react';
+import React, { use } from 'react';
 import Image from 'next/image';
 import { Book as BookType } from './types';
 import ActionsComp from './ActionsComp';
 import { useState, useEffect} from 'react';
 import { useAuth } from '@/components/authProvider';
-import { useRouter } from 'next/router';
 
 interface BookProps {
     book: BookType;
@@ -17,8 +16,44 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
     const auth = useAuth();
     const [showPrompt, setShowPrompt] = useState(false);
     const [rated, setIsRated] = useState(false);
+    const [error, setError] = useState(true);
     const [selectedRating, setSelectedRating] = useState(0);
+    const [bookpages, setbookpages] = useState([])
     const [message, setShowMessage] = useState('');
+    const [streamingMode, setStreamingMode] = useState(false);
+
+    const handleBookStreaming = async () => {
+        setStreamingMode(true)
+        const url_to_pages_route = "/api/bookPages/"
+        const options = {
+            methods: "GET",
+            headers: {
+                "content-type": "application/json"
+            }
+        }
+        try {
+            const response = await fetch(`${url_to_pages_route}${book.id}`, options)
+            const routeData = await response.json()
+            if (response.ok) {
+                setbookpages(routeData.pages)
+            }
+            else {
+                setShowPrompt(true);
+                setShowMessage(routeData.message)
+                setTimeout(() => {
+                setShowPrompt(false);
+                }, 5000)
+            }
+        }
+        catch (error) {
+            setShowPrompt(true);
+            setError(false);
+            setShowMessage("Internal Server Error, try checking after sometime")
+            setTimeout(() => {
+                setShowPrompt(false);
+            }, 5000)
+        }
+    }
 
     useEffect(() => {
         if (auth?.isAuthenticated) {
@@ -122,16 +157,33 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
 
     return (
     <>
-    <div className={`absolute top-[23em] md:top-[4em] z-[20000] right-2 md:-right-[5em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 shadow-md ${rated? 'bg-green-500' :'bg-red-400'} md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
+    <div className={`absolute top-[23em] md:top-[4em] z-[20000] right-2 md:-right-[5em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 shadow-md ${rated && error? 'bg-green-500' :'bg-red-400'} md:bg-opacity-50 ${showPrompt ? 'block' : 'hidden'}`}>
         <p>{ message }</p>
     </div>
             
+    {streamingMode && <section className='bg-slate-800 bg-opacity-70 absolute -top-[4em] w-[94.6em] h-[100vh] z-[30000] flex flex-col justify-center items-center -left-[7em]'>
+        <div className='absolute top-[1em] right-[5em] justify-end space-x-3 w-[10em] h-10 flex'>
+            <Image src="/images/settings.png" className="w-[2em]" alt={book.title} width={7190} height={6660}/>
+            <Image src="/images/close.png" onClick={() => {setStreamingMode(false)}} className="w-[2em] cursor-pointer" alt={book.title} width={7190} height={6660}/>
+        </div>            
+        {/*cover page  */}
+        <div className='bg-blue-400 h-[40em] w-[26em] trasnform border-2 shadow-2xl shadow-green-500 border-black'>
+            <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={7190} height={6660}/>
+        </div>
+        <div className='bg-yellow-100 absolute right-[10em] top-[5em] w-[20em] h-[30em]'>
+            <p className='text-center p-2 border-b-4 border-black font-bold'>Next page</p>            
+        </div>
+        <div className='bg-yellow-100 absolute left-[10em] top-[5em] w-[20em] h-[30em]'>
+            <p className='text-center p-2 border-b-4 border-black font-bold'>Previous page</p>            
+        </div>
+    </section>}        
+
     <div className="relative top-[17em] md:static bg-blue-300 bg-opacity-10 p-2 md:w-1/5 flex flex-col items-center rounded-md border-r-2 border-2 border-black">
         <div className="h-[13em] bg-blue-400 w-[10em]">
             <Image src={book.cover_img} className="w-full h-full" alt={book.title} width={1190} height={30}/>
         </div>
         <p className="font-serif mt-2">Genre: <span className="font-bold font-description">&lt;Fictional&gt;</span></p>
-        <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold">
+        <button className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold" onClick={handleBookStreaming}>
             Stream
         </button>
         <form action="" className="bg-slate-400 hover:bg-slate-700 hover:text-yellow-50 hover:transition-all shadow-md bg-opacity-50 hover:cursor-pointer w-[9em] h-[2.5em] flex justify-between mt-1 rounded-md text-lg">
@@ -150,10 +202,7 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
                 book.total_downloads >= 1 ? <div className={`bg-green-200 shadow-md font-bold ${index === 1 ? 'block' : 'hidden'} absolute h-8 w-8 text-center pt-1 border-1 border-black rounded-full md:left-28 left-[11em] top-[25em] z-[1000] md:top-[25.4em]`}>{book.total_downloads}</div> : ''          
                 }
                 <ActionsComp
-                    key={index
-
-                        
-                    }
+                    key={index}
                     img={actionItem.img}
                     action={actionItem.action}
                     alt={actionItem.alt}
