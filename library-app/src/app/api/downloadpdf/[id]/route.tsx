@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 const NINJA_DOWNLOAD_PDF = "http://127.0.0.1:8000/api/books/download_book/";
 
 // make a get request to ninja endpoint
-export async function GET(request: Request,
+export async function GET(
+  request: Request,
   { params }: { params: { id: number } }
 ) {
-
   const authToken = getToken();
   // return a 401 status code if token doesn't exist
   if (!authToken) {
