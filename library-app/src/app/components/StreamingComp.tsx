@@ -23,6 +23,15 @@ const Box = styled.div`
   border: 3px solid green;
 `;
 
+const Circle = styled.div`
+  width: 50px; /* Adjust the size as desired */
+  height: 50px; /* Equal height to maintain the circle shape */
+  text-align: center;
+  padding: 10px 0;
+  border: 3px solid green;
+  border-radius: 50%; /* Turn the square into a circle! */
+`;
+
 const Slider = styled.input.attrs({ type: "range" })`
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -65,7 +74,10 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   const [value, setValue] = useState(14);
 
   // font family
-  const [font_family, setFontFamily] = useState("")
+  const [font_family, setFontFamily] = useState("");
+
+  // set the theme for the streaming mode
+  const [theme, setTheme] = useState("");
 
   // an array of font families a Reader can choose From
   const font_families = [
@@ -74,8 +86,8 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
       value: "font-normal",
     },
     {
-      name: "Sans",
-      value: "font-sans",
+      name: "DM Serif Display",
+      value: "font-main",
     },
     {
       name: "Serif",
@@ -101,7 +113,27 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
       name: "Sail",
       value: "font-quote",
     },
+    {
+      name: "IBM Plex Sans",
+      value: "font-sub",
+    },
   ];
+
+  const themes = [
+    {
+      theme: "Default",
+      colors: ["bg-white", "bg-green-200", "bg-yellow-50"],
+    },
+    {
+      theme: "Dark",
+      colors: ["bg-black", "bg-green-500"],
+    },
+    {
+      theme: "Loly",
+      colors: ["bg-orange-500", "bg-white", "bg-slate-900","bg-yellow-50"],
+    },
+  ];
+
   // Exit Streaming Mode
   const toggleCloseStreamingMode = () => {
     const modeOpen = true;
@@ -171,7 +203,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
       {/* The Main content of the book goes here */}
       <main className="absolute flex space-x-3 -top-[4.5em] -left-[6.8em] -right-[6.8em] inset-0 to z-[10000]">
         {/* This section displays the Table Of content to the Reader */}
-        <section className="w-1/4 bg-white relative">
+        <section className={`w-1/4 ${theme === "Default" ? "bg-white": theme === "Dark"? "bg-black text-white": theme === "Loly"? "bg-orange-500 text-creamy-400":"bg-white"} relative`}>
           <div className="fixed  w-[18em] p-4">
             <p className="text-center underline font-bold text-3xl italic">
               Table of Content
@@ -186,7 +218,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                       // Highlight the heading green if the current content the reader is reading is the heading.
                       heading_to_highlight &&
                       current_page + 1 === heading.heading_id
-                        ? "text-green-600"
+                        ? `${theme === "Loly" ? "text-slate-900":"text-green-600"}`
                         : ""
                     }`}
                   >
@@ -198,7 +230,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                     {heading.subheadings &&
                       heading.subheadings.map((subheading, index) => (
                         <li
-                          className="hover:bg-green-600 hover:bg-opacity-10 mt-2"
+                          className={`${theme === "Default" ? "hover:bg-green-600 hover:bg-opacity-10 mt-2": theme === "Dark" ? "hover:bg-green-600 hover:bg-opacity-90 hover:transition-all p-1 rounded-md mt-2" : theme === "Loly" ? "hover:bg-slate-900 hover:bg-opacity-90 hover:transition-all p-1 mt-2" : "hover:bg-green-600 hover:bg-opacity-10 mt-2"}`}
                           key={subheading.subheading_id}
                         >
                           <span className="font-bold">
@@ -217,10 +249,14 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
           </div>
         </section>
         {/* This section Displays the actual content of the book and some settings related to the content */}
-        <section className={`w-full ${value > 27 ? "h-fit" : ""} bg-green-200 bg-opacity-80`}>
-          <div className="relative flex bg-white bg-opacity-90 justify-end border-t-4 border-t-black">
+        <section
+          className={`w-full ${
+            value > 27 ? "h-fit" : ""
+          } ${theme === "Default" ? "bg-green-200 bg-opacity-80": theme === "Dark" ? "bg-green-500" : theme === "Loly" ? "bg-slate-900 bg-opacity-80" : "bg-green-200 bg-opacity-80"} `}
+        >
+          <div className={`${theme === "Default" ? "bg-white bg-opacity-90 border-t-4 border-t-black": theme === "Dark" ? "bg-black text-green-500" : theme === "Loly" ? "bg-orange-500" : ""} relative flex  justify-end`}>
             {/* Settings Menu to help reader adjust prefrence */}
-            <div className="bg-blue-500 absolute top-12 w-[20em] h-[40em] z-[1000] border-2 shadow-2xl border-black rounded-md">
+            <div className="bg-blue-500 absolute top-12 w-[25em] text-black h-[40em] z-[1000] border-2 shadow-2xl border-black rounded-md">
               <p className="text-center font-light font-mono text-2xl border-b-2 p-1 shadow-2xl">
                 SETTINGS
               </p>
@@ -228,6 +264,34 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                 Modify how text, font sizes and colors appear to suit your
                 prefrence.
               </p>
+              <div className="bg-yellow-50 p-2">
+                <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
+                  Themes
+                </p>
+                <div>
+                  {themes.map((theme) => (
+                    <div key={theme.theme} className="mt-4">
+                      <h3>
+                        <label>
+                          <input
+                            type="radio"
+                            name="themes"
+                            value={theme.theme}
+                            // Handle the onChange event to capture the selected value
+                            onChange={(e) => setTheme(e.target.value)}
+                          />
+                          {theme.theme}
+                        </label>
+                      </h3>
+                      <div className="flex">
+                        {theme.colors.map((color) => (
+                          <Circle key={color} className={`${color}`} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="bg-yellow-50 p-2">
                 {/* text related settings */}
                 <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
@@ -255,22 +319,21 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                 </div>
                 {/* font family for user to choose which fonts they want to apply */}
                 <div className="mt-6">
-                  <p className="text-center">font family</p>
-                  <div className="text-2xl bg-blue-600 font-title flex flex-wrap space-x-6">
+                  <p className="text-center mb-4">font family</p>
+                  <div className="text-2xl font-title grid grid-flow-row grid-cols-2">
                     {font_families.map((font) => (
-                      <label key={font.value}>
-                        <input
-                          type="radio"
-                          name="fontFamily"
-                          value={font.value}
-                          
-                          // Handle the onChange event to capture the selected value
-                          onChange={(e) =>
-                            setFontFamily(e.target.value)
-                          }
-                        />
-                        {font.name}
-                      </label>
+                      <div key={font.value}>
+                        <label>
+                          <input
+                            type="radio"
+                            name="fontFamily"
+                            value={font.value}
+                            // Handle the onChange event to capture the selected value
+                            onChange={(e) => setFontFamily(e.target.value)}
+                          />
+                          {font.name}
+                        </label>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -287,7 +350,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                   height={60}
                 />
                 {/* progress in terms of percentage */}
-                <div className="bg-slate-300 rounded-full h-[2em] w-16 text-center border-2 border-black font-bold">
+                <div className="bg-slate-300 rounded-full text-black h-[2em] w-16 text-center border-2 border-black font-bold">
                   100%
                 </div>
               </div>
@@ -314,7 +377,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
               />
               <Image
                 src="/images/close.png"
-                className="w-[2em] bg-red-400 shadow-md hover:w-[2.4em] hover:shadow-red-600 hover:transition-all rounded-full"
+                className={`w-[2em] ${theme === "Loly" ? "bg-slate-50": "bg-red-400"} shadow-md hover:w-[2.4em] hover:shadow-red-600 hover:transition-all rounded-full`}
                 title="Close"
                 alt="settings"
                 width={700}
@@ -324,7 +387,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
             </div>
           </div>
           {/* Keep track of the Reader time to stop reading */}
-          <div className="text-center border-b-4 bg-white pt-4 border-b-black">
+          <div className={`${theme === "Default" ? "bg-white": theme === "Dark" ? "bg-black text-white" : theme === "Loly" ? "bg-slate-900 text-white" : "bg-white"} text-center border-b-4 pt-4 border-b-black`}>
             <span className="text-green-600 font-bold">Time Started:</span>{" "}
             <span className="italic">8 am</span> to{" "}
             <span className="text-orange-600 font-bold">End Time:</span>{" "}
@@ -389,15 +452,22 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                 </div>
               </>
             ) : (
-                // set the font size prefrence by the reader
-                <article className={`bg-yellow-50 border-x-2 border-x-black px-2 mx-[5em] flex flex-col items-center`}
-                  style={{fontSize: value !== 14 ? `${value}px` : ""}}
+              // set the font size prefrence by the reader
+              <article
+                className={`${theme === "Dark" ? "bg-black text-white": "bg-yellow-50"} border-x-2 border-x-black px-2 mx-[5em] flex flex-col items-center`}
+                style={{ fontSize: value !== 14 ? `${value}px` : "" }}
+              >
+                <p
+                  className={`text-center p-4 ${
+                    value > 20 ? "text-4xl" : "text-3xl"
+                  } font-bold`}
                 >
-                  <p className={`text-center p-4 ${value > 20 ? "text-4xl" :"text-3xl" } font-bold`}>
                   {currentContent.heading_name}
                 </p>
                 {currentContent.heading_content && (
-                  <p className="my-10">{currentContent.heading_content}</p>
+                  <p className={`my-10 ${font_family ? `${font_family}` : ""}`}>
+                    {currentContent.heading_content}
+                  </p>
                 )}
                 {currentContent.heading_image && (
                   <Image
@@ -413,11 +483,21 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                     className="flex flex-col items-center my-10 "
                     id={`${subheading.subheading_id}`}
                   >
-                    <p className={`mb-5 underline ${value > 20 ? "text-4xl": "text-2xl"} `}>
+                    <p
+                      className={`mb-5 underline ${
+                        value > 20 ? "text-4xl" : "text-2xl"
+                      } `}
+                    >
                       {subheading.subheading_name}
                     </p>
                     {subheading.subheading_content && (
-                      <p className="mb-2">{subheading.subheading_content}</p>
+                      <p
+                        className={`mb-2 ${
+                          font_family ? `${font_family}` : ""
+                        }`}
+                      >
+                        {subheading.subheading_content}
+                      </p>
                     )}
                     {subheading.subheading_image && (
                       <Image
