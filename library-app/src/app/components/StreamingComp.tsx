@@ -5,12 +5,52 @@ import React, { use } from "react";
 import { Book as BookType } from "./types";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/authProvider";
+import Link from "next/link";
 import Image from "next/image";
+import styled from "styled-components";
 
 interface BookProps {
   book: BookType;
   setStreamingMode: (mode: boolean) => void;
 }
+
+const Box = styled.div`
+  width: 50px; /* Adjust the width as desired */
+  height: 50px; /* Equal height to make it a square */
+  background-color: #f0f0f0; /* Set your preferred background color */
+  text-align: center;
+  padding: 10px 0;
+  border: 3px solid green;
+`;
+
+const Slider = styled.input.attrs({ type: "range" })`
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: 0;
+  height: 12px;
+  border-radius: 40px;
+  background: ${(props) =>
+    `linear-gradient(to right, #ff9800 0%, #ff9800 ${props.value}%, #fff ${props.value}%, #fff 100%);`};
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+
+  ::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background-image: radial-gradient(circle, #f7f7fc 40%, #ff9800 45%);
+    border-radius: 50%;
+    box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  ::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    -moz-appearance: none;
+    background-image: radial-gradient(circle, #f7f7fc 40%, #ff9800 45%);
+    border-radius: 50%;
+    box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.5);
+  }
+`;
 
 const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   const auth = useAuth();
@@ -20,23 +60,67 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   const [book_content, setBookContent] = useState([{}]);
   const [current_page, setCurrentPage] = useState(-1);
   const [currentContent, setCurrentContent] = useState({});
-  const [heading_to_highlight, setHeadingToHighlight] = useState(0);
+  const [heading_to_highlight, setHeadingToHighlight] = useState(false);
+  // value for font size
+  const [value, setValue] = useState(14);
 
+  // font family
+  const [font_family, setFontFamily] = useState("")
+
+  // an array of font families a Reader can choose From
+  const font_families = [
+    {
+      name: "None",
+      value: "font-normal",
+    },
+    {
+      name: "Sans",
+      value: "font-sans",
+    },
+    {
+      name: "Serif",
+      value: "font-serif",
+    },
+    {
+      name: "Monospace",
+      value: "font-mono",
+    },
+    {
+      name: "Dailymirror",
+      value: "font-title",
+    },
+    {
+      name: "Oswald",
+      value: "font-projects",
+    },
+    {
+      name: "Montserrat",
+      value: "font-body",
+    },
+    {
+      name: "Sail",
+      value: "font-quote",
+    },
+  ];
+  // Exit Streaming Mode
   const toggleCloseStreamingMode = () => {
     const modeOpen = true;
     setStreamingMode(!modeOpen);
   };
 
+  // navigate to the next page of this book
   const NavigateToNextPage = () => {
     setCurrentPage(current_page + 1);
     setCurrentContent(book_content[current_page + 1]);
-    setHeadingToHighlight(current_page + 1);
+    setHeadingToHighlight(true);
   };
+  // Navigate back to the previous page of this book
   const NavigateToPreviousPage = () => {
     setCurrentPage(current_page - 1);
     setCurrentContent(book_content[current_page - 1]);
   };
 
+  // fetch the book content from server when in streaming Mode
   const handleBookStreaming = async () => {
     const url_to_pages_route = "/api/bookPages/";
     const options = {
@@ -70,10 +154,13 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
     }
   };
   useEffect(() => {
+    // call streaming mode
     handleBookStreaming();
   }, [book.id]);
   return (
     <>
+      {/* An Error Message to prompt the user if something goes wrong */}
+
       <div
         className={`absolute top-[23em] md:top-[4em] z-[20000] right-2 md:-right-[5em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 shadow-md ${
           !error ? "bg-green-500" : "bg-red-400"
@@ -81,35 +168,115 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
       >
         <p>{message}</p>
       </div>
-      <main className="absolute flex space-x-3 -top-[4.5em] -left-[6.8em] -right-[6.8em] inset-0 to bg-blue-500 z-[10000]">
-        <section className="w-1/4 bg-yellow-100 p-4">
-          <p className="text-center underline font-bold text-3xl italic">
-            Table of Content
-          </p>
-          <ul className="bg-blue-400 flex flex-col space-y-10 mt-10">
-            {book_content.map((heading) => (
-              <li key={heading.heading_id}>
-                <p className="font-bold text-xl">
-                  <span className="font-bold">{heading.heading_id}.</span>{" "}
-                  {heading.heading_name}
-                </p>
-                <ul className="mt-4 pl-4">
-                  {heading.subheadings &&
-                    heading.subheadings.map((subheading, index) => (
-                      <li key={subheading.subheading_id}>
-                        <span className="font-bold">
-                          {heading.heading_id}.{index + 1}{" "}
-                        </span>
-                        {subheading.subheading_name}
-                      </li>
-                    ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
+      {/* The Main content of the book goes here */}
+      <main className="absolute flex space-x-3 -top-[4.5em] -left-[6.8em] -right-[6.8em] inset-0 to z-[10000]">
+        {/* This section displays the Table Of content to the Reader */}
+        <section className="w-1/4 bg-white relative">
+          <div className="fixed  w-[18em] p-4">
+            <p className="text-center underline font-bold text-3xl italic">
+              Table of Content
+            </p>
+            <ul className="flex flex-col space-y-10 mt-10">
+              {/* Loop through each Heading of the book */}
+              {book_content.map((heading) => (
+                <li key={heading.heading_id}>
+                  {/* Display the heading name */}
+                  <p
+                    className={`font-bold text-xl ${
+                      // Highlight the heading green if the current content the reader is reading is the heading.
+                      heading_to_highlight &&
+                      current_page + 1 === heading.heading_id
+                        ? "text-green-600"
+                        : ""
+                    }`}
+                  >
+                    <span className="font-bold">{heading.heading_id}.</span>{" "}
+                    {heading.heading_name}
+                  </p>
+                  <ul className="mt-4 pl-4">
+                    {/* Loop through the subheadings of the current heading and display it's content as well */}
+                    {heading.subheadings &&
+                      heading.subheadings.map((subheading, index) => (
+                        <li
+                          className="hover:bg-green-600 hover:bg-opacity-10 mt-2"
+                          key={subheading.subheading_id}
+                        >
+                          <span className="font-bold">
+                            {heading.heading_id}.{index + 1}{" "}
+                          </span>
+                          {/* if the reader is reading this heading, reader can navigate easily to subheadings */}
+                          <Link href={`#${subheading.subheading_id}`}>
+                            {subheading.subheading_name}
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
-        <section className="w-full bg-green-200">
-          <div className="relative flex bg-yellow-200 justify-end">
+        {/* This section Displays the actual content of the book and some settings related to the content */}
+        <section className={`w-full ${value > 27 ? "h-fit" : ""} bg-green-200 bg-opacity-80`}>
+          <div className="relative flex bg-white bg-opacity-90 justify-end border-t-4 border-t-black">
+            {/* Settings Menu to help reader adjust prefrence */}
+            <div className="bg-blue-500 absolute top-12 w-[20em] h-[40em] z-[1000] border-2 shadow-2xl border-black rounded-md">
+              <p className="text-center font-light font-mono text-2xl border-b-2 p-1 shadow-2xl">
+                SETTINGS
+              </p>
+              <p className="p-2 font-title">
+                Modify how text, font sizes and colors appear to suit your
+                prefrence.
+              </p>
+              <div className="bg-yellow-50 p-2">
+                {/* text related settings */}
+                <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
+                  Text Related
+                </p>
+                {/* font size */}
+                <p className="ml-1 mr-2 font-about text-center">
+                  font size{" "}
+                  <span className="font-title block  text-red-600">
+                    adjust the slider to prefered font size
+                  </span>
+                </p>
+
+                {/* Group Styled objects */}
+                <div className="flex justify-between">
+                  {/* A Slider component */}
+                  <div className="p-3">
+                    <Slider
+                      value={value}
+                      // assign the value of the slider to the state variable
+                      onChange={(e) => setValue(parseInt(e.target.value))}
+                    />
+                  </div>
+                  <Box>{value}px</Box>
+                </div>
+                {/* font family for user to choose which fonts they want to apply */}
+                <div className="mt-6">
+                  <p className="text-center">font family</p>
+                  <div className="text-2xl bg-blue-600 font-title flex flex-wrap space-x-6">
+                    {font_families.map((font) => (
+                      <label key={font.value}>
+                        <input
+                          type="radio"
+                          name="fontFamily"
+                          value={font.value}
+                          
+                          // Handle the onChange event to capture the selected value
+                          onChange={(e) =>
+                            setFontFamily(e.target.value)
+                          }
+                        />
+                        {font.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* This div displays the readers progress through the book */}
             <div className="p-2 flex absolute left-2 -top-1">
               <div className="relative flex">
                 <Image
@@ -119,10 +286,12 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                   width={400}
                   height={60}
                 />
+                {/* progress in terms of percentage */}
                 <div className="bg-slate-300 rounded-full h-[2em] w-16 text-center border-2 border-black font-bold">
                   100%
                 </div>
               </div>
+              {/* Notebook, to Help Readers Jot down Notes */}
               <div className="flex  ml-[30em]">
                 <span className="font-bold p-3">write notes</span>
                 <Image
@@ -145,7 +314,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
               />
               <Image
                 src="/images/close.png"
-                className="w-[2em] bg-emerald-100 shadow-md hover:w-[2.4em] hover:shadow-red-600 hover:transition-all rounded-full"
+                className="w-[2em] bg-red-400 shadow-md hover:w-[2.4em] hover:shadow-red-600 hover:transition-all rounded-full"
                 title="Close"
                 alt="settings"
                 width={700}
@@ -154,13 +323,17 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
               />
             </div>
           </div>
-          <div className="text-center border-b-4 border-b-black">
+          {/* Keep track of the Reader time to stop reading */}
+          <div className="text-center border-b-4 bg-white pt-4 border-b-black">
             <span className="text-green-600 font-bold">Time Started:</span>{" "}
             <span className="italic">8 am</span> to{" "}
             <span className="text-orange-600 font-bold">End Time:</span>{" "}
             <span className="italic">not specified</span>
           </div>
+
+          {/* The actual content area */}
           <article className="relative">
+            {/* Display the left arrow if current page is not the cover page */}
             {current_page >= 0 && (
               <Image
                 src="/images/left.svg"
@@ -172,6 +345,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                 onClick={NavigateToPreviousPage}
               />
             )}
+            {/* Don't Display the right arrow if current page is the last page */}
             {current_page < book_content.length - 1 && (
               <Image
                 src="/images/right.svg"
@@ -198,7 +372,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                       height={60000}
                     />
                   </div>
-                  <ul className="mt-4">
+                  <ul className="mt-4 bg-white w-[20em] text-center rounded-md">
                     <li className="font-bold">
                       <span className="italic font-light text-xl">
                         Written By:{" "}
@@ -215,8 +389,11 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                 </div>
               </>
             ) : (
-              <article className="bg-yellow-50 mx-[5em] flex flex-col items-center">
-                <p className="text-center p-4 text-3xl font-bold">
+                // set the font size prefrence by the reader
+                <article className={`bg-yellow-50 border-x-2 border-x-black px-2 mx-[5em] flex flex-col items-center`}
+                  style={{fontSize: value !== 14 ? `${value}px` : ""}}
+                >
+                  <p className={`text-center p-4 ${value > 20 ? "text-4xl" :"text-3xl" } font-bold`}>
                   {currentContent.heading_name}
                 </p>
                 {currentContent.heading_content && (
@@ -233,9 +410,10 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                 {currentContent.subheadings.map((subheading) => (
                   <div
                     key={subheading.subheading_id}
-                    className="flex flex-col items-center my-10"
+                    className="flex flex-col items-center my-10 "
+                    id={`${subheading.subheading_id}`}
                   >
-                    <p className="mb-5 underline text-2xl">
+                    <p className={`mb-5 underline ${value > 20 ? "text-4xl": "text-2xl"} `}>
                       {subheading.subheading_name}
                     </p>
                     {subheading.subheading_content && (
