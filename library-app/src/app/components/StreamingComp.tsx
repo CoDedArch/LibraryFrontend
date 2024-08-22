@@ -8,11 +8,15 @@ import { useAuth } from "@/components/authProvider";
 import Link from "next/link";
 import Image from "next/image";
 import styled from "styled-components";
+import { Heading } from "./types";
+import { useRef } from "react";
 
 interface BookProps {
   book: BookType;
   setStreamingMode: (mode: boolean) => void;
 }
+
+// structure for how subheadings are modelled
 
 const Box = styled.div`
   width: 50px; /* Adjust the width as desired */
@@ -66,20 +70,54 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [error, setError] = useState(false);
   const [message, setShowMessage] = useState("");
-  const [book_content, setBookContent] = useState([{}]);
+  const [book_content, setBookContent] = useState<Heading[]>([
+    {
+      heading_id: 0,
+      heading_name: "",
+      heading_content: "",
+      heading_image: "",
+      subheadings: [
+        {
+          subheading_id: 0,
+          subheading_name: "",
+          subheading_content: "",
+          subheading_image: "",
+        },
+      ],
+    },
+  ]);
+  const [currentContent, setCurrentContent] = useState<Heading>({
+    heading_id: 0,
+    heading_name: "",
+    heading_content: "",
+    heading_image: "",
+    subheadings: [
+      {
+        subheading_id: 0,
+        subheading_name: "",
+        subheading_content: "",
+        subheading_image: "",
+      },
+    ],
+  });
   const [current_page, setCurrentPage] = useState(-1);
-  const [currentContent, setCurrentContent] = useState({});
   const [heading_to_highlight, setHeadingToHighlight] = useState(false);
+  const [show_menu, setShowMenu] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
   // value for font size
+
   const [value, setValue] = useState(14);
 
   // font family
+
   const [font_family, setFontFamily] = useState("");
 
   // set the theme for the streaming mode
+
   const [theme, setTheme] = useState("");
 
   // an array of font families a Reader can choose From
+
   const font_families = [
     {
       name: "None",
@@ -130,29 +168,40 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
     },
     {
       theme: "Loly",
-      colors: ["bg-orange-500", "bg-white", "bg-slate-900","bg-yellow-50"],
+      colors: ["bg-orange-500", "bg-white", "bg-slate-900", "bg-yellow-50"],
     },
   ];
 
+  // toggle settings menu
+
+  const toggleSettingsMenu = () => {
+    setShowMenu(!show_menu);
+  };
+
   // Exit Streaming Mode
+
   const toggleCloseStreamingMode = () => {
     const modeOpen = true;
     setStreamingMode(!modeOpen);
   };
 
   // navigate to the next page of this book
+
   const NavigateToNextPage = () => {
     setCurrentPage(current_page + 1);
     setCurrentContent(book_content[current_page + 1]);
     setHeadingToHighlight(true);
   };
+
   // Navigate back to the previous page of this book
+
   const NavigateToPreviousPage = () => {
     setCurrentPage(current_page - 1);
     setCurrentContent(book_content[current_page - 1]);
   };
 
   // fetch the book content from server when in streaming Mode
+
   const handleBookStreaming = async () => {
     const url_to_pages_route = "/api/bookPages/";
     const options = {
@@ -187,6 +236,16 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   };
   useEffect(() => {
     // call streaming mode
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(event.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
     handleBookStreaming();
   }, [book.id]);
   return (
@@ -200,11 +259,34 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
       >
         <p>{message}</p>
       </div>
+
       {/* The Main content of the book goes here */}
+
       <main className="absolute flex space-x-3 -top-[4.5em] -left-[6.8em] -right-[6.8em] inset-0 to z-[10000]">
         {/* This section displays the Table Of content to the Reader */}
-        <section className={`w-1/4 ${theme === "Default" ? "bg-white": theme === "Dark"? "bg-black text-white": theme === "Loly"? "bg-orange-500 text-creamy-400":"bg-white"} relative`}>
-          <div className="fixed  w-[18em] p-4">
+
+        <section
+          className={`w-1/4 ${
+            theme === "Default"
+              ? "bg-white"
+              : theme === "Dark"
+              ? "bg-black text-white"
+              : theme === "Loly"
+              ? "bg-orange-500 text-creamy-400"
+              : "bg-white"
+          } relative`}
+        >
+          <div
+            className={`fixed  w-[18em] p-4 ${
+              theme === "Default"
+                ? "bg-white"
+                : theme === "Dark"
+                ? "bg-black text-white"
+                : theme === "Loly"
+                ? "bg-orange-500 text-creamy-400"
+                : "bg-white"
+            }`}
+          >
             <p className="text-center underline font-bold text-3xl italic">
               Table of Content
             </p>
@@ -218,11 +300,17 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                       // Highlight the heading green if the current content the reader is reading is the heading.
                       heading_to_highlight &&
                       current_page + 1 === heading.heading_id
-                        ? `${theme === "Loly" ? "text-slate-900":"text-green-600"}`
+                        ? `${
+                            theme === "Loly"
+                              ? "text-slate-900"
+                              : "text-green-600"
+                          }`
                         : ""
                     }`}
                   >
-                    <span className="font-bold">{heading.heading_id}.</span>{" "}
+                    <span className="font-bold">
+                      {heading.heading_id ? `${heading.heading_id}.` : ""}
+                    </span>{" "}
                     {heading.heading_name}
                   </p>
                   <ul className="mt-4 pl-4">
@@ -230,11 +318,21 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                     {heading.subheadings &&
                       heading.subheadings.map((subheading, index) => (
                         <li
-                          className={`${theme === "Default" ? "hover:bg-green-600 hover:bg-opacity-10 mt-2": theme === "Dark" ? "hover:bg-green-600 hover:bg-opacity-90 hover:transition-all p-1 rounded-md mt-2" : theme === "Loly" ? "hover:bg-slate-900 hover:bg-opacity-90 hover:transition-all p-1 mt-2" : "hover:bg-green-600 hover:bg-opacity-10 mt-2"}`}
+                          className={`${
+                            theme === "Default"
+                              ? "hover:bg-green-600 hover:bg-opacity-10 mt-2"
+                              : theme === "Dark"
+                              ? "hover:bg-green-600 hover:bg-opacity-90 hover:transition-all p-1 rounded-md mt-2"
+                              : theme === "Loly"
+                              ? "hover:bg-slate-900 hover:bg-opacity-90 hover:transition-all p-1 mt-2"
+                              : "hover:bg-green-600 hover:bg-opacity-10 mt-2"
+                          }`}
                           key={subheading.subheading_id}
                         >
                           <span className="font-bold">
-                            {heading.heading_id}.{index + 1}{" "}
+                            {heading.heading_id
+                              ? `${heading.heading_id}.${index + 1}${" "}`
+                              : ""}
                           </span>
                           {/* if the reader is reading this heading, reader can navigate easily to subheadings */}
                           <Link href={`#${subheading.subheading_id}`}>
@@ -250,95 +348,116 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
         </section>
         {/* This section Displays the actual content of the book and some settings related to the content */}
         <section
-          className={`w-full ${
-            value > 27 ? "h-fit" : ""
-          } ${theme === "Default" ? "bg-green-200 bg-opacity-80": theme === "Dark" ? "bg-green-500" : theme === "Loly" ? "bg-slate-900 bg-opacity-80" : "bg-green-200 bg-opacity-80"} `}
+          className={`w-full ${value > 27 ? "h-fit" : ""} ${
+            theme === "Default"
+              ? "bg-green-200 bg-opacity-80"
+              : theme === "Dark"
+              ? "bg-green-500"
+              : theme === "Loly"
+              ? "bg-slate-900 bg-opacity-80"
+              : "bg-green-200 bg-opacity-80"
+          } `}
         >
-          <div className={`${theme === "Default" ? "bg-white bg-opacity-90 border-t-4 border-t-black": theme === "Dark" ? "bg-black text-green-500" : theme === "Loly" ? "bg-orange-500" : ""} relative flex  justify-end`}>
+          <div
+            className={`${
+              theme === "Default"
+                ? "bg-white bg-opacity-90 border-t-4 border-t-black"
+                : theme === "Dark"
+                ? "bg-black text-green-500"
+                : theme === "Loly"
+                ? "bg-orange-500"
+                : "bg-white"
+            } relative flex  justify-end`}
+          >
             {/* Settings Menu to help reader adjust prefrence */}
-            <div className="bg-blue-500 absolute top-12 w-[25em] text-black h-[40em] z-[1000] border-2 shadow-2xl border-black rounded-md">
-              <p className="text-center font-light font-mono text-2xl border-b-2 p-1 shadow-2xl">
-                SETTINGS
-              </p>
-              <p className="p-2 font-title">
-                Modify how text, font sizes and colors appear to suit your
-                prefrence.
-              </p>
-              <div className="bg-yellow-50 p-2">
-                <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
-                  Themes
+            {show_menu && (
+              <div
+                ref={settingsRef}
+                className="bg-yellow-50 absolute top-12 w-[25em] text-black h-fit z-[1000] border-2 shadow-2xl border-black rounded-md"
+              >
+                <p className="text-center font-light font-mono text-2xl border-b-2 p-1 shadow-2xl">
+                  SETTINGS
                 </p>
-                <div>
-                  {themes.map((theme) => (
-                    <div key={theme.theme} className="mt-4">
-                      <h3>
-                        <label>
-                          <input
-                            type="radio"
-                            name="themes"
-                            value={theme.theme}
-                            // Handle the onChange event to capture the selected value
-                            onChange={(e) => setTheme(e.target.value)}
-                          />
-                          {theme.theme}
-                        </label>
-                      </h3>
-                      <div className="flex">
-                        {theme.colors.map((color) => (
-                          <Circle key={color} className={`${color}`} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-yellow-50 p-2">
-                {/* text related settings */}
-                <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
-                  Text Related
+                <p className="p-2 font-title">
+                  Modify how text, font sizes and colors appear to suit your
+                  prefrence.
                 </p>
-                {/* font size */}
-                <p className="ml-1 mr-2 font-about text-center">
-                  font size{" "}
-                  <span className="font-title block  text-red-600">
-                    adjust the slider to prefered font size
-                  </span>
-                </p>
-
-                {/* Group Styled objects */}
-                <div className="flex justify-between">
-                  {/* A Slider component */}
-                  <div className="p-3">
-                    <Slider
-                      value={value}
-                      // assign the value of the slider to the state variable
-                      onChange={(e) => setValue(parseInt(e.target.value))}
-                    />
-                  </div>
-                  <Box>{value}px</Box>
-                </div>
-                {/* font family for user to choose which fonts they want to apply */}
-                <div className="mt-6">
-                  <p className="text-center mb-4">font family</p>
-                  <div className="text-2xl font-title grid grid-flow-row grid-cols-2">
-                    {font_families.map((font) => (
-                      <div key={font.value}>
-                        <label>
-                          <input
-                            type="radio"
-                            name="fontFamily"
-                            value={font.value}
-                            // Handle the onChange event to capture the selected value
-                            onChange={(e) => setFontFamily(e.target.value)}
-                          />
-                          {font.name}
-                        </label>
+                <div className="bg-yellow-50 p-2">
+                  <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
+                    Themes
+                  </p>
+                  <div>
+                    {themes.map((theme) => (
+                      <div key={theme.theme} className="mt-4">
+                        <h3>
+                          <label>
+                            <input
+                              type="radio"
+                              name="themes"
+                              value={theme.theme}
+                              // Handle the onChange event to capture the selected value
+                              onChange={(e) => setTheme(e.target.value)}
+                            />
+                            {theme.theme}
+                          </label>
+                        </h3>
+                        <div className="flex">
+                          {theme.colors.map((color) => (
+                            <Circle key={color} className={`${color}`} />
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
+                <div className="bg-yellow-50 p-2">
+                  {/* text related settings */}
+                  <p className="font-mono text-lg mb-5 border-b-2 border-b-black">
+                    Text Related
+                  </p>
+                  {/* font size */}
+                  <p className="ml-1 mr-2 font-about text-center">
+                    font size{" "}
+                    <span className="font-title block  text-red-600">
+                      adjust the slider to prefered font size
+                    </span>
+                  </p>
+
+                  {/* Group Styled objects */}
+                  <div className="flex justify-between">
+                    {/* A Slider component */}
+                    <div className="p-3">
+                      <Slider
+                        value={value}
+                        // assign the value of the slider to the state variable
+                        onChange={(e) => setValue(parseInt(e.target.value))}
+                      />
+                    </div>
+                    <Box>{value}px</Box>
+                  </div>
+                  {/* font family for user to choose which fonts they want to apply */}
+                  <div className="mt-6">
+                    <p className="text-center mb-4">font family</p>
+                    <div className="text-2xl font-title grid grid-flow-row grid-cols-2">
+                      {font_families.map((font) => (
+                        <div key={font.value}>
+                          <label>
+                            <input
+                              type="radio"
+                              name="fontFamily"
+                              value={font.value}
+                              // Handle the onChange event to capture the selected value
+                              onChange={(e) => setFontFamily(e.target.value)}
+                            />
+                            {font.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
             {/* This div displays the readers progress through the book */}
             <div className="p-2 flex absolute left-2 -top-1">
               <div className="relative flex">
@@ -367,17 +486,22 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
               </div>
             </div>
             <div className="flex space-x-2 p-2">
+              {/* Toggle Settings Menu*/}
               <Image
                 src="/images/setting.png"
-                className="w-[2em]"
+                className="w-[2em] hover:cursor-pointer"
                 title="settings"
                 alt="settings"
                 width={700}
                 height={60}
+                onClick={toggleSettingsMenu}
               />
+              {/* Exit Streaming Mode*/}
               <Image
                 src="/images/close.png"
-                className={`w-[2em] ${theme === "Loly" ? "bg-slate-50": "bg-red-400"} shadow-md hover:w-[2.4em] hover:shadow-red-600 hover:transition-all rounded-full`}
+                className={`w-[2em] ${
+                  theme === "Loly" ? "bg-slate-50" : "bg-red-400"
+                } shadow-md hover:w-[2.4em] hover:shadow-red-600 hover:transition-all rounded-full`}
                 title="Close"
                 alt="settings"
                 width={700}
@@ -387,7 +511,17 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
             </div>
           </div>
           {/* Keep track of the Reader time to stop reading */}
-          <div className={`${theme === "Default" ? "bg-white": theme === "Dark" ? "bg-black text-white" : theme === "Loly" ? "bg-slate-900 text-white" : "bg-white"} text-center border-b-4 pt-4 border-b-black`}>
+          <div
+            className={`${
+              theme === "Default"
+                ? "bg-white"
+                : theme === "Dark"
+                ? "bg-black text-white"
+                : theme === "Loly"
+                ? "bg-slate-900 text-white"
+                : "bg-white"
+            } text-center border-b-4 pt-4 border-b-black`}
+          >
             <span className="text-green-600 font-bold">Time Started:</span>{" "}
             <span className="italic">8 am</span> to{" "}
             <span className="text-orange-600 font-bold">End Time:</span>{" "}
@@ -454,7 +588,9 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
             ) : (
               // set the font size prefrence by the reader
               <article
-                className={`${theme === "Dark" ? "bg-black text-white": "bg-yellow-50"} border-x-2 border-x-black px-2 mx-[5em] flex flex-col items-center`}
+                className={`${
+                  theme === "Dark" ? "bg-black text-white" : "bg-yellow-50"
+                } border-x-2 border-x-black px-2 mx-[5em] flex flex-col items-center`}
                 style={{ fontSize: value !== 14 ? `${value}px` : "" }}
               >
                 <p
@@ -517,5 +653,4 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
     </>
   );
 };
-
 export default StreamingComp;
