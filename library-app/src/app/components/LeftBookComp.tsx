@@ -31,6 +31,14 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
 
   const handleStreamingMode = () => setStreamingMode(!streamingMode);
 
+  const showStreamingError = () => {
+    setShowMessage("You'll need to Login to read this book");
+    setShowPrompt(true);
+    setTimeout(() => {
+      setShowPrompt(false)
+    }, 5000)
+  }
+
   const fetchUserRating = async (book_id: number) => {
     const user_rating_url = `/api/userrating/${book_id}`;
     const get_options = {
@@ -162,10 +170,23 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
           <span className="font-bold font-description">&lt;Fictional&gt;</span>
         </p>
         <button
-          className="bg-green-700 bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold"
-          onClick={handleStreamingMode}
+          className={`bg-green-700 ${
+            !auth?.isAuthenticated ? "flex justify-center pt-2" : ""
+          } bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold`}
+          onClick={auth?.isAuthenticated ? handleStreamingMode :  showStreamingError}
         >
-          Stream
+          <span className={`${!auth?.isAuthenticated ? "block pr-2" : ""}`}>
+            Stream
+          </span>
+          {!auth?.isAuthenticated && (
+            <Image
+              src="/images/locked.png"
+              className="w-[1em] mt-1"
+              alt="lock"
+              width={233}
+              height={30}
+            />
+          )}
         </button>
         <form
           action=""

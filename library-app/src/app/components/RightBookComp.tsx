@@ -25,7 +25,7 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
 
   const getBooksByAuthor = async (publisher_name: string) => {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/books/publisher/${publisher_name}`
+      `http://127.0.0.1:8000/api/books/publisher/${book.id}/${publisher_name}`
     );
     const data = await response.json();
     return data;
@@ -141,11 +141,15 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
                 </button>
               )}
             </div>
-            <div className="flex space-x-2 md:space-x-10">
-              {selectedBooks.map((authorbook) => (
-                <BookComp key={authorbook.id} book={authorbook} />
-              ))}
-            </div>
+            {authorBooks ? (
+              <div className="flex space-x-2 md:space-x-10">
+                {selectedBooks.map((authorbook) => (
+                  <BookComp key={authorbook.id} book={authorbook} />
+                ))}
+              </div>
+            ) : (
+              <p className="font-mono">This is the only Book by this Author </p>
+            )}
             <div className="flex flex-col justify-center ml-10">
               {totalPages > 1 && (
                 <button onClick={handleNext}>

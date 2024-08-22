@@ -2,7 +2,6 @@
 import React from "react";
 import Image from "next/image";
 import { Book as BookType } from "./types";
-import Link from "next/link";
 
 interface BookProps {
   book: BookType;
