@@ -24,3 +24,20 @@ export interface Genre {
   id: number;
   genre: string;
 }
+
+export type Heading = {
+  heading_id: number;
+  heading_name: string;
+  heading_content: string;
+  heading_image: string; // Assuming this is a URL or file path
+  subheadings: Subheading[]; // Optional subheading
+};
+
+// structure for how subheadings are modelled
+
+type Subheading = {
+  subheading_id: number;
+  subheading_name: string;
+  subheading_content: string;
+  subheading_image: string; // Assuming this is a URL or file path
+};
