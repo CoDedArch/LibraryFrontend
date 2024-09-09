@@ -17,7 +17,7 @@ const metadata: Metadata = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html>
-      <body className="bg-creamy-100">
+      <body className="bg-stylish-300">
         {/* Header goes in here */}
 
         <AuthProvider>
