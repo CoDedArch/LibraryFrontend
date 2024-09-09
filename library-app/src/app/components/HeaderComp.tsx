@@ -15,25 +15,48 @@ const HeaderComp: React.FC = () => {
   const [showBrowseMenu, setShowBrowseMenu] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const browseRef = useRef<HTMLUListElement>(null);
 
   const router = useRouter();
+  // render menu will toggle the menu on and off
   const renderMenu = () => {
     setShowMenu(!showmenu);
   };
 
+  // browser menu will toggle the browse menu on and off
   const browseMenu = () => {
     setShowBrowseMenu(!showBrowseMenu);
   };
+
+  // when the user is in phone view and clicks on the search icon, toggles the search bar
   const handleSearchIconClick = () => {
     setShowSearchBar(window.innerWidth < 640 ? !showSearchBar : false);
   };
   useEffect(() => {
+    // handles closing the menu bar when the user clicks outside of this refrence
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowMenu(false);
       }
     };
+
+    const handleClosingBrowsingMenu = (e: MouseEvent) => {
+      if (browseRef.current && !browseRef.current.contains(e.target as Node)) {
+        setShowBrowseMenu(false);
+      }
+    };
+    // add event listener for closing menu tab
     document.addEventListener("mousedown", handleClickOutside);
+
+    // add event listener for closing browser tab
+    document.addEventListener("mousedown", handleClosingBrowsingMenu);
+
+    return () => {
+      //remove event listener for closing menu tab
+      document.removeEventListener("mousedown", handleClickOutside);
+      //remove event listener for closing browsing tab
+      document.removeEventListener("click", handleClosingBrowsingMenu);
+    };
   }, []);
 
   async function handleLogout(event: React.MouseEvent<HTMLButtonElement>) {
@@ -53,37 +76,39 @@ const HeaderComp: React.FC = () => {
   }
 
   return (
-    <header className="flex flex-row justify-between p-2 text-lg md:pr-[9em]">
+    <header className="flex flex-row justify-between p-2 text-lg md:pr-[9em] shadow-md">
       {/* Browsing links to help users navigate to various sections */}
-      <ul
-        className={`${
-          showBrowseMenu ? "block" : "hidden"
-        } absolute top-[6.4em] right-3 md:top-[3.4em] md:left-[32em] z-[10000] bg-orange-200 md:bg-opacity-80 rounded-md w-[10em]`}
-      >
-        {browse_links.map((link, link_index) => (
-          <li
-            key={link_index}
-            className="my-3 pt-2 hover:bg-creamy-100 border-b-2 hover:bg-opacity-60"
+      {showBrowseMenu && (
+        <>
+          <ul
+            ref={browseRef}
+            className={`absolute top-[6.4em] font-title right-3 md:top-[3.4em] md:left-[32em] z-[10000] bg-white-100 rounded-md w-[10em]`}
           >
-            <Link
-              href={link === "all books" ? "/" : `/${link}`}
-              className="pl-2"
-            >
-              {link}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
+            {browse_links.map((link, link_index) => (
+              <li
+                key={link_index}
+                className="my-3 pt-2 hover:bg-stylish-400 text-stylish-400 cursor-pointer border-b-2 border-b-yellow-800 hover:bg-opacity-30"
+              >
+                <Link
+                  href={link === "all books" ? "/" : `/${link}`}
+                  className="pl-2"
+                >
+                  {link}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       {/* This contains the Logo and the Name of the application */}
-      <div className="p-2 font-extrabold text-2xl flex space-x-6">
+      <div className="p-2 font-bold font-main text-3xl flex space-x-6">
         <Link href="/" className={`${showSearchBar ? "hidden" : "block"}`}>
           Let&lsquo;s Learn
         </Link>
         <p className="absolute top-[2.4em] md:static font-extralight text-2xl md:text-lg p-1 md:bg-orange-200 bg-opacity-25 hover:bg-opacity-10 transition-opacity">
           <a
             href="http://"
-            className=" hover:text-orange-300 transition-colors"
+            className=" hover:text-stylish-400 transition-colors"
           >
             My Books
           </a>
@@ -99,8 +124,8 @@ const HeaderComp: React.FC = () => {
               : "top-[3.4em] right-[2em]"
           } md:static md:p-2`}
         >
-          <p className="font-extralight font-mono w-fit text-2xl">Browse</p>
-          <div className="p-3 pl-[2px] w-[2em]">
+          <p className="font-extralight w-fit text-xl">Browse</p>
+          <div className="p-2 pl-[2px] mt-[2px] w-[2em]">
             {showBrowseMenu ? (
               <Image
                 src="/images/up.png"
@@ -174,14 +199,14 @@ const HeaderComp: React.FC = () => {
         {auth?.isAuthenticated ? (
           <button
             onClick={handleLogout}
-            className="hidden sm:block right-[18em] text-center hover:bg-red-400 hover:text-white hover:border-black transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-red-400 mt-1"
+            className="hidden sm:block right-[18em] text-center hover:bg-red-400 hover:text-white hover:border-black transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-red-400 mt-1"
           >
             Log out
           </button>
         ) : (
           <Link
             href="/login"
-            className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-mono"
+            className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-main"
           >
             Log in
           </Link>
@@ -203,7 +228,7 @@ const HeaderComp: React.FC = () => {
             href="/signup"
             className={`${
               showSearchBar ? "hidden" : "block"
-            } text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1`}
+            } text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-black mt-1`}
           >
             JOIN
           </Link>
@@ -231,23 +256,23 @@ const HeaderComp: React.FC = () => {
             ></div>
             <section
               ref={menuRef}
-              className="absolute bg-orange-200 shadow-2xl z-[1000] -right-[0.5px] md:right-[1em] w-[11em] rounded-t-md h-[20em]"
+              className="absolute bg-white-100 text-stylish-400 shadow-2xl z-[1000] -right-[0.5px] md:right-[1em] w-[11em] md:w-[21em] rounded-t-md h-[100vh]"
             >
-              <p className="text-center border-b-2 border-b-yellow-800 font-description">
+              <p className="text-center border-b-2 border-b-yellow-800 font-bold">
                 my Let&apos;s learn
               </p>
-              <div className="flex space-x-2 md:space-x-3 py-2">
+              <div className="flex justify-between space-x-2 md:space-x-3 py-[2em] p-3">
                 {auth?.isAuthenticated ? (
                   <button
                     onClick={handleLogout}
-                    className="text-center hover:bg-red-400 hover:text-white hover:border-black transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-red-400 mt-1"
+                    className="text-center hover:bg-red-400 hover:text-white-100 hover:border-black transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-red-400 mt-1"
                   >
                     Log out
                   </button>
                 ) : (
                   <Link
                     href="/login"
-                    className="text-center pt-1 bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1"
+                    className="text-center pt-1 bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-main text-green-500 border-solid border-2 border-black mt-1"
                   >
                     log in
                   </Link>
@@ -259,20 +284,20 @@ const HeaderComp: React.FC = () => {
                 ) : (
                   <Link
                     href="/signup"
-                    className="text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-mono border-solid border-2 border-black mt-1"
+                    className="text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-black mt-1"
                   >
                     JOIN
                   </Link>
                 )}
               </div>
-              <p className="text-center border-b-2 border-b-yellow-800 font-description mt-3">
+              <p className="text-center border-b-2 border-b-yellow-800 font-bold mt-[5em]">
                 Browse
               </p>
-              <ul>
+              <ul className="py-[2em] p-3 font-title">
                 {browse_links.map((link, link_index) => (
                   <li
                     key={link_index}
-                    className="pt-2 hover:bg-creamy-100 hover:bg-opacity-20"
+                    className="pt-2 hover:bg-stylish-400 hover:bg-opacity-30"
                   >
                     <Link
                       href={link === "all books" ? "/" : `/${link}`}
@@ -283,13 +308,13 @@ const HeaderComp: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <p className="text-center border-b-2 border-b-yellow-800 font-description mt-3">
+              <p className="text-center border-b-2 border-b-yellow-800 mt-3 font-bold mt-[5em]">
                 Contribute
               </p>
               {contribs.map((contrib, contrib_index) => (
                 <p
                   key={contrib_index}
-                  className="pl-2 shadow-md shadow-green-400 w-fit bg-creamy-100 ml-1aa"
+                  className="pl-2 shadow-md shadow-green-400 w-fit bg-creamy-100 ml-1aa mt-4 ml-3"
                 >
                   <a href="">{contrib}</a>
                 </p>
