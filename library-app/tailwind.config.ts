@@ -19,7 +19,18 @@ const config: Config = {
           200: '#F7F1ED',
           300: '#F7F4EF',
           400: '#F8EFEA'
-        }
+        },
+        'white': {
+          100: '#FFFFFF',
+          200: '#FFFAFB'
+        },
+        'stylish': {
+          100: '#A5FFD6',
+          200: '#FF686B',
+          300: '#F2F3D9',
+          400: '#030027',
+        },
+
       },
       fontFamily: {
         title: ['Dailymirror', 'Personal', 'Use'],
