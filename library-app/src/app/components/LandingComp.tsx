@@ -28,7 +28,7 @@ const LandingComp = () => {
     <section className="bg-stylish-500 flex flex-col h-[100vh] mt-[6em] md:mt-0">
       <div className="flex flex-col justify-center">
         <div className="">
-          <h1 className="text-5xl font-main text-center text-stylish-400">
+          <h1 className="text-5xl md:text-8xl font-sub text-center text-stylish-400">
             Welcome to Let&apos;s Learn!
           </h1>
           <div className="flex justify-center">
@@ -38,18 +38,16 @@ const LandingComp = () => {
               ))}
             </h2>
           </div>
-          <p className="flex p-2 font-title text-justify text-lg">
-            At Let&apos;s Learn, we believe in the power of stories, curiosity,
-            and imagination! This is a special online library designed for kids
-            and teens under 20, offering a world of books that inspire
-            creativity, learning, and fun. Whether you&apos;re looking for your
-            next favorite adventure, exploring science, history, or discovering
-            new worlds, Let&apos;s Learn has something for everyone.
-          </p>
+          <div className="flex justify-center">
+            <p className="flex p-2 font-body text-center text-lg w-[45em]">
+            Africa&apos;s Biggest Online Library for Basic School & High School Students.
+            Come on and join the fun side!
+            </p>
+          </div>
           <div className="flex justify-center p-2">
             <Link
               href="/signup"
-              className="text-center p-2 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all rounded-md font-main border-solid  border-2 border-black mt-1"
+              className="text-center p-2 bg-stylish-600 text-white-100 hover:bg-creamy-100 hover:text-stylish-600 hover:border-stylish-600 transition-all rounded-md font-body font-semibold border-solid  border-2 border-black mt-1"
             >
               Get Started with Us Today! 😊
             </Link>

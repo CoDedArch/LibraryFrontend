@@ -11,6 +11,8 @@ import styled from "styled-components";
 import { Heading } from "./types";
 import { useRef } from "react";
 
+
+
 interface BookProps {
   book: BookType;
   setStreamingMode: (mode: boolean) => void;
@@ -37,6 +39,35 @@ const Circle = styled.div`
 `;
 
 const Slider = styled.input.attrs({ type: "range" })`
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: 0;
+  height: 12px;
+  border-radius: 40px;
+  background: ${(props) =>
+    `linear-gradient(to right, #ff9800 0%, #ff9800 ${props.value}%, #fff ${props.value}%, #fff 100%);`};
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+
+  ::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background-image: radial-gradient(circle, #f7f7fc 40%, #ff9800 45%);
+    border-radius: 50%;
+    box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  ::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    -moz-appearance: none;
+    background-image: radial-gradient(circle, #f7f7fc 40%, #ff9800 45%);
+    border-radius: 50%;
+    box-shadow: 0px 0px 4px 2px rgba(0, 0, 0, 0.5);
+  }
+`;
+
+const Volume = styled.input.attrs({ type: "range" })`
   -webkit-appearance: none;
   -moz-appearance: none;
   outline: 0;
@@ -104,9 +135,13 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   const [heading_to_highlight, setHeadingToHighlight] = useState(false);
   const [show_menu, setShowMenu] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const [audioSrc, setAudioSrc] = useState<string>("");
   // value for font size
 
   const [value, setValue] = useState(14);
+  const [volume, setVolume] = useState(50);
+
+  const [togglePlay, setTogglePlay] = useState(false);
 
   // font family
 
@@ -160,15 +195,20 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
   const themes = [
     {
       theme: "Default",
-      colors: ["bg-white", "bg-green-200", "bg-yellow-50"],
+      colors: ["bg-green-500", "bg-stylish-300", "bg-yellow-50"],
     },
     {
       theme: "Dark",
-      colors: ["bg-black", "bg-green-500"],
+      colors: ["bg-black", "bg-green-500", "bg-stylish-200"],
     },
     {
       theme: "Loly",
-      colors: ["bg-orange-500", "bg-white", "bg-slate-900", "bg-yellow-50"],
+      colors: [
+        "bg-orange-500",
+        "bg-stylish-200",
+        "bg-slate-900",
+        "bg-yellow-50",
+      ],
     },
   ];
 
@@ -204,6 +244,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
 
   const handleBookStreaming = async () => {
     const url_to_pages_route = "/api/bookPages/";
+    const url_to_audio_route = "/api/audio/";
     const options = {
       methods: "GET",
       headers: {
@@ -211,16 +252,26 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
       },
     };
     try {
-      const response = await fetch(`${url_to_pages_route}${book.id}`, options);
-      const routeData = await response.json();
+      const response = await fetch(
+        `${book.book_type === "AU" ? url_to_audio_route : url_to_pages_route}${
+          book.id
+        }`,
+        options
+      );
+
       if (response.ok) {
         setStreamingMode(true);
-        setBookContent(routeData.content);
-        console.log(`book content is : ${book_content}`);
+        if (book.book_type === "AU") {
+          const audio_data = await response.json();
+          setAudioSrc(audio_data["audio_uri"]);
+        } else {
+          const routeData = await response.json();
+          setBookContent(routeData.content);
+        }
       } else {
         setError(true);
         setShowPrompt(true);
-        setShowMessage(routeData.message);
+        setShowMessage("An Error Has Occured while trying to retrieve pages");
         setTimeout(() => {
           setShowPrompt(false);
         }, 5000);
@@ -262,100 +313,103 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
 
       {/* The Main content of the book goes here */}
 
-      <main className="absolute flex space-x-3 -top-[4.5em] -left-[6.8em] -right-[6.8em] inset-0 to z-[10000]">
+      <main className="absolute flex -top-[4.5em] -left-[6.8em] -right-[6.8em] inset-0 to z-[10000]">
         {/* This section displays the Table Of content to the Reader */}
-
-        <section
-          className={`w-1/4 ${
-            theme === "Default"
-              ? "bg-white"
-              : theme === "Dark"
-              ? "bg-black text-white"
-              : theme === "Loly"
-              ? "bg-orange-500 text-creamy-400"
-              : "bg-white"
-          } relative`}
-        >
-          <div
-            className={`fixed  w-[18em] p-4 ${
+        {book.book_type === "EB" ? (
+          <section
+            className={`w-1/4 ${
               theme === "Default"
-                ? "bg-white"
+                ? "bg-stylish-300"
                 : theme === "Dark"
-                ? "bg-black text-white"
+                ? "bg-black text-stylish-200"
                 : theme === "Loly"
-                ? "bg-orange-500 text-creamy-400"
-                : "bg-white"
-            }`}
+                ? "bg-orange-500 text-stylish-300"
+                : "bg-stylish-300"
+            } relative border-r-4 border-r-black`}
           >
-            <p className="text-center underline font-bold text-3xl italic">
-              Table of Content
-            </p>
-            <ul className="flex flex-col space-y-10 mt-10">
-              {/* Loop through each Heading of the book */}
-              {book_content.map((heading) => (
-                <li key={heading.heading_id}>
-                  {/* Display the heading name */}
-                  <p
-                    className={`font-bold text-xl ${
-                      // Highlight the heading green if the current content the reader is reading is the heading.
-                      heading_to_highlight &&
-                      current_page + 1 === heading.heading_id
-                        ? `${
-                            theme === "Loly"
-                              ? "text-slate-900"
-                              : "text-green-600"
-                          }`
-                        : ""
-                    }`}
-                  >
-                    <span className="font-bold">
-                      {heading.heading_id ? `${heading.heading_id}.` : ""}
-                    </span>{" "}
-                    {heading.heading_name}
-                  </p>
-                  <ul className="mt-4 pl-4">
-                    {/* Loop through the subheadings of the current heading and display it's content as well */}
-                    {heading.subheadings &&
-                      heading.subheadings.map((subheading, index) => (
-                        <li
-                          className={`${
-                            theme === "Default"
-                              ? "hover:bg-green-600 hover:bg-opacity-10 mt-2"
-                              : theme === "Dark"
-                              ? "hover:bg-green-600 hover:bg-opacity-90 hover:transition-all p-1 rounded-md mt-2"
-                              : theme === "Loly"
-                              ? "hover:bg-slate-900 hover:bg-opacity-90 hover:transition-all p-1 mt-2"
-                              : "hover:bg-green-600 hover:bg-opacity-10 mt-2"
-                          }`}
-                          key={subheading.subheading_id}
-                        >
-                          <span className="font-bold">
-                            {heading.heading_id
-                              ? `${heading.heading_id}.${index + 1}${" "}`
-                              : ""}
-                          </span>
-                          {/* if the reader is reading this heading, reader can navigate easily to subheadings */}
-                          <Link href={`#${subheading.subheading_id}`}>
-                            {subheading.subheading_name}
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+            <div
+              className={`fixed  w-[18em] p-4 ${
+                theme === "Default"
+                  ? "bg-stylish-300"
+                  : theme === "Dark"
+                  ? "bg-black"
+                  : theme === "Loly"
+                  ? "bg-orange-500 text-stylish-300"
+                  : "bg-stylish-300"
+              }`}
+            >
+              <p className="text-center underline font-bold text-3xl italic">
+                Table of Content
+              </p>
+              <ul className="flex flex-col space-y-10 mt-10">
+                {/* Loop through each Heading of the book */}
+                {book_content.map((heading) => (
+                  <li key={heading.heading_id}>
+                    {/* Display the heading name */}
+                    <p
+                      className={`font-bold text-xl ${
+                        // Highlight the heading green if the current content the reader is reading is the heading.
+                        heading_to_highlight &&
+                        current_page + 1 === heading.heading_id
+                          ? `${
+                              theme === "Loly"
+                                ? "text-slate-900"
+                                : "text-green-600"
+                            }`
+                          : ""
+                      }`}
+                    >
+                      <span className="font-bold">
+                        {heading.heading_id ? `${heading.heading_id}.` : ""}
+                      </span>{" "}
+                      {heading.heading_name}
+                    </p>
+                    <ul className="mt-4 pl-4">
+                      {/* Loop through the subheadings of the current heading and display it's content as well */}
+                      {heading.subheadings &&
+                        heading.subheadings.map((subheading, index) => (
+                          <li
+                            className={`${
+                              theme === "Default"
+                                ? "hover:bg-green-600 hover:bg-opacity-10 mt-2"
+                                : theme === "Dark"
+                                ? "hover:bg-green-600 hover:bg-opacity-50 hover:transition-all p-1 rounded-md mt-2"
+                                : theme === "Loly"
+                                ? "hover:bg-slate-900 hover:bg-opacity-90 hover:transition-all p-1 mt-2"
+                                : "hover:bg-green-600 hover:bg-opacity-10 mt-2"
+                            }`}
+                            key={subheading.subheading_id}
+                          >
+                            <span className="font-bold">
+                              {heading.heading_id
+                                ? `${heading.heading_id}.${index + 1}${" "}`
+                                : ""}
+                            </span>
+                            {/* if the reader is reading this heading, reader can navigate easily to subheadings */}
+                            <Link href={`#${subheading.subheading_id}`}>
+                              {subheading.subheading_name}
+                            </Link>
+                          </li>
+                        ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        ) : (
+          ""
+        )}
         {/* This section Displays the actual content of the book and some settings related to the content */}
         <section
           className={`w-full ${value > 27 ? "h-fit" : ""} ${
             theme === "Default"
-              ? "bg-green-200 bg-opacity-80"
+              ? "bg-stylish-300"
               : theme === "Dark"
-              ? "bg-green-500"
+              ? "bg-black text-white-100"
               : theme === "Loly"
-              ? "bg-slate-900 bg-opacity-80"
-              : "bg-green-200 bg-opacity-80"
+              ? "bg-slate-900 bg-opacity-80 text-stylish-300"
+              : "bg-stylish-300"
           } `}
         >
           <div
@@ -488,7 +542,7 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
             <div className="flex space-x-2 p-2">
               {/* Toggle Settings Menu*/}
               <Image
-                src="/images/setting.png"
+                src="/images/adjust.png"
                 className="w-[2em] hover:cursor-pointer"
                 title="settings"
                 alt="settings"
@@ -523,13 +577,39 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
             } text-center border-b-4 pt-4 border-b-black`}
           >
             <span className="text-green-600 font-bold">Time Started:</span>{" "}
-            <span className="italic">8 am</span> to{" "}
-            <span className="text-orange-600 font-bold">End Time:</span>{" "}
-            <span className="italic">not specified</span>
+            <span
+              className={`italic ${
+                theme === "Default"
+                  ? "text-black"
+                  : theme === "Dark"
+                  ? "text-white-100"
+                  : theme === "Loly"
+                  ? "text-white-100"
+                  : "text-black"
+              }`}
+            >
+              8 am
+            </span>{" "}
+            to <span className="text-orange-600 font-bold">End Time:</span>{" "}
+            <span
+              className={`italic ${
+                theme === "Default"
+                  ? "text-black"
+                  : theme === "Dark"
+                  ? "text-white-100"
+                  : theme === "Loly"
+                  ? "text-white-100"
+                  : "text-black"
+              }`}
+            >
+              not specified
+            </span>
           </div>
 
           {/* The actual content area */}
-          <article className="relative">
+          <article
+            className={`relative ${theme === "Loly" ? "text-stylish-600" : ""}`}
+          >
             {/* Display the left arrow if current page is not the cover page */}
             {current_page >= 0 && (
               <Image
@@ -543,20 +623,23 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
               />
             )}
             {/* Don't Display the right arrow if current page is the last page */}
-            {current_page < book_content.length - 1 && (
+            {current_page < book_content.length - 1 &&
+            book.book_type !== "AU" ? (
               <Image
                 src="/images/right.svg"
-                alt="left"
+                alt="right"
                 title="next chapter"
                 className="w-[4em] bg-white border-2 border-green-600 fixed right-1 top-[50%] hover:w-[4.4em] hover:transition-all"
                 width={150}
                 height={60}
                 onClick={NavigateToNextPage}
               />
+            ) : (
+              ""
             )}
             {current_page === -1 ? (
               <>
-                <div className="p-3 text-3xl text-center font-bold">
+                <div className="p-3 text-3xl text-center font-sub font-bold">
                   {book.title}
                 </div>
                 <div className="flex flex-col items-center">
@@ -584,6 +667,719 @@ const StreamingComp: React.FC<BookProps> = ({ book, setStreamingMode }) => {
                     </li>
                   </ul>
                 </div>
+
+                {book.book_type === "AU" ? (
+                  <>
+                    <div className="flex flex-col items-center mt-[2em]">
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="absolute left-[28em]"
+                          viewBox="0 0 719.25 30.42"
+                        >
+                          <g id="a" />
+                          <g id="b">
+                            <g id="c">
+                              <g>
+                                <g>
+                                  <rect
+                                    x="11.27"
+                                    y="23.08"
+                                    width="2.17"
+                                    height="7.33"
+                                  />
+                                  <rect
+                                    x="15.03"
+                                    y="23.08"
+                                    width="2.17"
+                                    height="7.33"
+                                  />
+                                  <rect
+                                    x="18.79"
+                                    y="23.17"
+                                    width="2.17"
+                                    height="7.25"
+                                  />
+                                  <rect y="25.23" width="2.17" height="5.19" />
+                                  <rect
+                                    x="3.76"
+                                    y="25.23"
+                                    width="2.17"
+                                    height="5.19"
+                                  />
+                                  <rect
+                                    x="7.52"
+                                    y="25.29"
+                                    width="2.17"
+                                    height="5.13"
+                                  />
+                                  <rect
+                                    x="22.55"
+                                    y="20.94"
+                                    width="2.17"
+                                    height="9.48"
+                                  />
+                                  <rect
+                                    x="26.3"
+                                    y="17.88"
+                                    width="2.17"
+                                    height="12.54"
+                                  />
+                                  <rect
+                                    x="30.06"
+                                    y="16.25"
+                                    width="2.17"
+                                    height="14.17"
+                                  />
+                                  <rect
+                                    x="33.82"
+                                    y="11.29"
+                                    width="2.17"
+                                    height="19.12"
+                                  />
+                                  <rect
+                                    x="37.58"
+                                    y="6.92"
+                                    width="2.17"
+                                    height="23.5"
+                                  />
+                                  <rect
+                                    x="41.34"
+                                    y="13.7"
+                                    width="2.17"
+                                    height="16.72"
+                                  />
+                                  <rect
+                                    x="45.09"
+                                    y="2.33"
+                                    width="2.17"
+                                    height="28.08"
+                                  />
+                                  <rect x="48.85" width="2.17" height="30.42" />
+                                  <rect
+                                    x="52.61"
+                                    y="5.17"
+                                    width="2.17"
+                                    height="25.25"
+                                  />
+                                  <rect
+                                    x="56.37"
+                                    y="9.33"
+                                    width="2.17"
+                                    height="21.08"
+                                  />
+                                  <rect
+                                    x="60.13"
+                                    y="12.35"
+                                    width="2.17"
+                                    height="18.06"
+                                  />
+                                  <rect
+                                    x="63.88"
+                                    y="7.85"
+                                    width="2.17"
+                                    height="22.56"
+                                  />
+                                  <rect
+                                    x="67.64"
+                                    y="9.6"
+                                    width="2.17"
+                                    height="20.81"
+                                  />
+                                  <rect
+                                    x="108.98"
+                                    y="7.98"
+                                    width="2.17"
+                                    height="22.44"
+                                  />
+                                  <rect
+                                    x="112.74"
+                                    y="3.6"
+                                    width="2.17"
+                                    height="26.81"
+                                  />
+                                  <rect
+                                    x="116.49"
+                                    y="9.36"
+                                    width="2.17"
+                                    height="21.05"
+                                  />
+                                  <rect
+                                    x="120.25"
+                                    y="2.33"
+                                    width="2.17"
+                                    height="28.08"
+                                  />
+                                  <rect
+                                    x="124.01"
+                                    width="2.17"
+                                    height="30.42"
+                                  />
+                                  <rect
+                                    x="127.77"
+                                    y="5.17"
+                                    width="2.17"
+                                    height="25.25"
+                                  />
+                                  <rect
+                                    x="131.52"
+                                    y="9.33"
+                                    width="2.17"
+                                    height="21.08"
+                                  />
+                                  <rect
+                                    x="135.28"
+                                    y="12.35"
+                                    width="2.17"
+                                    height="18.06"
+                                  />
+                                  <rect
+                                    x="139.04"
+                                    y="7.85"
+                                    width="2.17"
+                                    height="22.56"
+                                  />
+                                  <rect
+                                    x="142.8"
+                                    y="12.66"
+                                    width="2.17"
+                                    height="17.75"
+                                  />
+                                  <rect
+                                    x="146.56"
+                                    y="9.36"
+                                    width="2.17"
+                                    height="21.05"
+                                  />
+                                  <rect
+                                    x="150.31"
+                                    y="2.33"
+                                    width="2.17"
+                                    height="28.08"
+                                  />
+                                  <rect
+                                    x="154.07"
+                                    width="2.17"
+                                    height="30.42"
+                                  />
+                                  <rect
+                                    x="157.83"
+                                    y="5.17"
+                                    width="2.17"
+                                    height="25.25"
+                                  />
+                                  <rect
+                                    x="161.59"
+                                    y="9.36"
+                                    width="2.17"
+                                    height="21.05"
+                                  />
+                                  <rect
+                                    x="165.35"
+                                    y="2.33"
+                                    width="2.17"
+                                    height="28.08"
+                                  />
+                                  <rect x="169.1" width="2.17" height="30.42" />
+                                  <rect
+                                    x="172.86"
+                                    y="5.17"
+                                    width="2.17"
+                                    height="25.25"
+                                  />
+                                  <rect
+                                    x="176.62"
+                                    y="9.33"
+                                    width="2.17"
+                                    height="21.08"
+                                  />
+                                  <rect
+                                    x="180.38"
+                                    y="12.35"
+                                    width="2.17"
+                                    height="18.06"
+                                  />
+                                  <rect
+                                    x="184.13"
+                                    y="7.85"
+                                    width="2.17"
+                                    height="22.56"
+                                  />
+                                  <rect
+                                    x="187.89"
+                                    y="9.6"
+                                    width="2.17"
+                                    height="20.81"
+                                  />
+                                  <rect
+                                    x="71.4"
+                                    y="15.14"
+                                    width="2.17"
+                                    height="15.27"
+                                  />
+                                  <rect
+                                    x="75.16"
+                                    y="11.65"
+                                    width="2.17"
+                                    height="18.77"
+                                  />
+                                  <rect
+                                    x="78.91"
+                                    y="17.06"
+                                    width="2.17"
+                                    height="13.35"
+                                  />
+                                  <rect
+                                    x="82.67"
+                                    y="7.99"
+                                    width="2.17"
+                                    height="22.43"
+                                  />
+                                  <rect
+                                    x="86.43"
+                                    y="6.12"
+                                    width="2.17"
+                                    height="24.29"
+                                  />
+                                  <rect
+                                    x="90.19"
+                                    y="10.25"
+                                    width="2.17"
+                                    height="20.17"
+                                  />
+                                  <rect
+                                    x="93.95"
+                                    y="13.58"
+                                    width="2.17"
+                                    height="16.84"
+                                  />
+                                  <rect
+                                    x="97.7"
+                                    y="15.99"
+                                    width="2.17"
+                                    height="14.43"
+                                  />
+                                  <rect
+                                    x="101.46"
+                                    y="12.4"
+                                    width="2.17"
+                                    height="18.02"
+                                  />
+                                  <rect
+                                    x="105.22"
+                                    y="13.8"
+                                    width="2.17"
+                                    height="16.62"
+                                  />
+                                  <rect
+                                    x="191.65"
+                                    y="11.29"
+                                    width="2.17"
+                                    height="19.12"
+                                  />
+                                  <rect
+                                    x="195.41"
+                                    y="6.92"
+                                    width="2.17"
+                                    height="23.5"
+                                  />
+                                  <rect
+                                    x="199.17"
+                                    y="13.7"
+                                    width="2.17"
+                                    height="16.72"
+                                  />
+                                  <rect
+                                    x="202.92"
+                                    y="2.33"
+                                    width="2.17"
+                                    height="28.08"
+                                  />
+                                  <rect
+                                    x="206.68"
+                                    width="2.17"
+                                    height="30.42"
+                                  />
+                                  <rect
+                                    x="210.44"
+                                    y="5.17"
+                                    width="2.17"
+                                    height="25.25"
+                                  />
+                                  <rect
+                                    x="214.2"
+                                    y="9.33"
+                                    width="2.17"
+                                    height="21.08"
+                                  />
+                                  <rect
+                                    x="217.96"
+                                    y="12.35"
+                                    width="2.17"
+                                    height="18.06"
+                                  />
+                                  <rect
+                                    x="221.71"
+                                    y="7.85"
+                                    width="2.17"
+                                    height="22.56"
+                                  />
+                                  <rect
+                                    x="225.47"
+                                    y="9.6"
+                                    width="2.17"
+                                    height="20.81"
+                                  />
+                                  <rect
+                                    x="304.34"
+                                    y="9.36"
+                                    width="2.17"
+                                    height="21.05"
+                                  />
+                                  <rect
+                                    x="308.1"
+                                    y="2.33"
+                                    width="2.17"
+                                    height="28.08"
+                                  />
+                                  <rect
+                                    x="311.86"
+                                    width="2.17"
+                                    height="30.42"
+                                  />
+                                  <rect
+                                    x="315.62"
+                                    y="5.17"
+                                    width="2.17"
+                                    height="25.25"
+                                  />
+                                  <rect
+                                    x="319.37"
+                                    y="9.33"
+                                    width="2.17"
+                                    height="21.08"
+                                  />
+                                  <rect
+                                    x="323.13"
+                                    y="12.35"
+                                    width="2.17"
+                                    height="18.06"
+                                  />
+                                  <rect
+                                    x="326.89"
+                                    y="7.85"
+                                    width="2.17"
+                                    height="22.56"
+                                  />
+                                  <rect
+                                    x="330.65"
+                                    y="9.6"
+                                    width="2.17"
+                                    height="20.81"
+                                  />
+                                  <rect
+                                    x="334.41"
+                                    y="11.29"
+                                    width="2.17"
+                                    height="19.12"
+                                  />
+                                  <g>
+                                    <rect
+                                      x="266.81"
+                                      y="15.18"
+                                      width="2.17"
+                                      height="15.24"
+                                    />
+                                    <rect
+                                      x="270.56"
+                                      y="6.92"
+                                      width="2.17"
+                                      height="23.5"
+                                    />
+                                    <rect
+                                      x="274.32"
+                                      y="12.32"
+                                      width="2.17"
+                                      height="18.09"
+                                    />
+                                    <rect
+                                      x="278.08"
+                                      y="2.33"
+                                      width="2.17"
+                                      height="28.08"
+                                    />
+                                    <rect
+                                      x="281.84"
+                                      width="2.17"
+                                      height="30.42"
+                                    />
+                                    <rect
+                                      x="285.6"
+                                      y="5.17"
+                                      width="2.17"
+                                      height="25.25"
+                                    />
+                                    <rect
+                                      x="289.35"
+                                      y="9.33"
+                                      width="2.17"
+                                      height="21.08"
+                                    />
+                                    <rect
+                                      x="293.11"
+                                      y="12.35"
+                                      width="2.17"
+                                      height="18.06"
+                                    />
+                                    <rect
+                                      x="296.87"
+                                      y="7.85"
+                                      width="2.17"
+                                      height="22.56"
+                                    />
+                                    <rect
+                                      x="300.63"
+                                      y="9.6"
+                                      width="2.17"
+                                      height="20.81"
+                                    />
+                                  </g>
+                                  <g>
+                                    <rect
+                                      x="229.23"
+                                      y="16.61"
+                                      width="2.17"
+                                      height="13.8"
+                                    />
+                                    <rect
+                                      x="232.99"
+                                      y="21.73"
+                                      width="2.17"
+                                      height="8.69"
+                                    />
+                                    <rect
+                                      x="236.74"
+                                      y="23.57"
+                                      width="2.17"
+                                      height="6.22"
+                                    />
+                                    <rect
+                                      x="240.5"
+                                      y="22.37"
+                                      width="2.17"
+                                      height="8.05"
+                                    />
+                                    <rect
+                                      x="244.26"
+                                      y="23.99"
+                                      width="2.17"
+                                      height="6.12"
+                                    />
+                                    <rect
+                                      x="248.02"
+                                      y="23.77"
+                                      width="2.17"
+                                      height="6.65"
+                                    />
+                                    <rect
+                                      x="251.78"
+                                      y="23.68"
+                                      width="2.17"
+                                      height="6.73"
+                                    />
+                                    <rect
+                                      x="255.53"
+                                      y="22.93"
+                                      width="2.17"
+                                      height="7.48"
+                                    />
+                                    <rect
+                                      x="259.29"
+                                      y="21.76"
+                                      width="2.17"
+                                      height="8.65"
+                                    />
+                                    <rect
+                                      x="263.05"
+                                      y="18.59"
+                                      width="2.17"
+                                      height="11.83"
+                                    />
+                                  </g>
+                                </g>
+                                <g>
+                                  <g>
+                                    <rect
+                                      x="405.81"
+                                      y="23.08"
+                                      width="2.17"
+                                      height="7.33"
+                                    />
+                                    <rect
+                                      x="402.05"
+                                      y="23.08"
+                                      width="2.17"
+                                      height="7.33"
+                                    />
+                                    <rect
+                                      x="398.29"
+                                      y="23.17"
+                                      width="2.17"
+                                      height="7.25"
+                                    />
+                                    <rect
+                                      x="413.32"
+                                      y="25.23"
+                                      width="2.17"
+                                      height="5.19"
+                                    />
+                                    <rect
+                                      x="409.56"
+                                      y="25.29"
+                                      width="2.17"
+                                      height="5.13"
+                                    />
+                                    <rect
+                                      x="417.08"
+                                      y="25.23"
+                                      width="2.17"
+                                      height="5.19"
+                                    />
+                                    <rect
+                                      x="394.53"
+                                      y="20.94"
+                                      width="2.17"
+                                      height="9.48"
+                                    />
+                                    <polyline points="390.77 30.42 390.77 17.88 392.95 17.88 392.95 30.42" />
+                                    <polyline points="387.02 30.42 387.02 16.25 389.19 16.25 389.19 30.42" />
+                                    <rect
+                                      x="383.26"
+                                      y="11.29"
+                                      width="2.17"
+                                      height="19.12"
+                                    />
+                                  </g>
+                                  <g>
+                                    <rect
+                                      x="338.16"
+                                      y="6.92"
+                                      width="2.17"
+                                      height="23.5"
+                                    />
+                                    <rect
+                                      x="341.92"
+                                      y="13.7"
+                                      width="2.17"
+                                      height="16.72"
+                                    />
+                                    <rect
+                                      x="345.68"
+                                      y="2.33"
+                                      width="2.17"
+                                      height="28.08"
+                                    />
+                                    <rect
+                                      x="349.44"
+                                      width="2.17"
+                                      height="30.42"
+                                    />
+                                    <rect
+                                      x="353.2"
+                                      y="5.17"
+                                      width="2.17"
+                                      height="25.25"
+                                    />
+                                    <rect
+                                      x="371.98"
+                                      y="2.33"
+                                      width="2.17"
+                                      height="28.08"
+                                    />
+                                    <rect
+                                      x="375.74"
+                                      width="2.17"
+                                      height="30.42"
+                                    />
+                                    <rect
+                                      x="379.5"
+                                      y="5.17"
+                                      width="2.17"
+                                      height="25.25"
+                                    />
+                                    <rect
+                                      x="356.95"
+                                      y="9.33"
+                                      width="2.17"
+                                      height="21.08"
+                                    />
+                                    <rect
+                                      x="360.71"
+                                      y="12.35"
+                                      width="2.17"
+                                      height="18.06"
+                                    />
+                                    <rect
+                                      x="364.47"
+                                      y="7.85"
+                                      width="2.17"
+                                      height="22.56"
+                                    />
+                                    <rect
+                                      x="368.23"
+                                      y="9.6"
+                                      width="2.17"
+                                      height="20.81"
+                                    />
+                                  </g>
+                                </g>
+                              </g>
+                            </g>
+                          </g>
+                        </svg>
+                      </div>
+                      {/* <div className="flex space-x-20 mt-[4em]">
+                        <Image
+                          src={`${
+                            !togglePlay
+                              ? "/images/play.png"
+                              : "/images/pause.png"
+                          } `}
+                          alt="play button"
+                          className="w-[5em] shadow-2xl hover:scale-110 transition-all cursor-pointer"
+                          width={1000}
+                          height={30}
+                          onClick={() => {
+                            setTogglePlay(!togglePlay);
+                          }}
+                        />
+                        <div className="flex space-x-4">
+                          <Image
+                            src="/images/audio.png"
+                            alt="play button"
+                            className="w-[2em] h-[2em] hover:scale-105 transition-all cursor-pointer"
+                            width={1000}
+                            height={30}
+                          />
+                          <div className="pt-3 flex">
+                            <Volume
+                              value={volume}
+                              onChange={(e) =>
+                                setVolume(parseInt(e.target.value))
+                              }
+                            />
+                          </div>
+                          <p className="pt-1 rounded-full shadow-md h-[2em] w-[2.5em] bg-white-100 text-stylish-600 font-bold">
+                            <span className="pl-2">{volume}</span>
+                          </p>
+                        </div> */}
+                        {audioSrc && <audio className="mt-[4em]" controls src={audioSrc}/>}
+                      {/* </div> */}
+                    </div>
+                  </>
+                ) : (
+                  ""
+                )}
               </>
             ) : (
               // set the font size prefrence by the reader

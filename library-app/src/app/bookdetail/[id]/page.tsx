@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Book as BookType } from "@/app/components/types";
 import LeftBookComp from "@/app/components/LeftBookComp";
 import RightBookComp from "@/app/components/RightBookComp";
+import HeaderComp from "@/app/components/HeaderComp";
 
 // This page presents the details of a book
 export default function BookDetails({ params }: { params: { id: string } }) {
@@ -43,11 +44,14 @@ export default function BookDetails({ params }: { params: { id: string } }) {
   if (!book) return <div>Book not found</div>;
 
   return (
-    <main className="h-fit">
-      <section className="relative mt-[3em] md:mt-0 md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md p-2">
-        <LeftBookComp book={book}></LeftBookComp>
-        <RightBookComp book={book} publisher={book.publisher}></RightBookComp>
-      </section>
-    </main>
+    <>
+      <HeaderComp></HeaderComp>
+      <main className="h-fit bg-stylish-500 pb-[5em]">
+        <section className="relative mt-[7em] md:mt-[7em] md:flex bg-white-100 md:mx-[7em] h-fit justify-between rounded-md p-2">
+          <LeftBookComp book={book}></LeftBookComp>
+          <RightBookComp book={book} publisher={book.publisher}></RightBookComp>
+        </section>
+      </main>
+    </>
   );
 }

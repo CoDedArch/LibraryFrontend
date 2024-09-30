@@ -29,6 +29,8 @@ const config: Config = {
           200: '#FF686B',
           300: '#F2F3D9',
           400: '#030027',
+          500: '#D5F0FC',
+          600: '#1E90FF'
         },
 
       },
@@ -40,7 +42,7 @@ const config: Config = {
         body:['Montserrat'],
         quote: ['Sail'],
         main: ['DM Serif Display'],
-        sub: ['IBM Plex Sans'],
+        sub: ['Chelsea Market'],
       },
     },
   },

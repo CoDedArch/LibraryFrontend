@@ -15,7 +15,7 @@ const GenreCompo: React.FC<GenreProps> = ({ genre }) => {
   const [booksPerPage, setBooksPerPage] = useState(2);
   useEffect(() => {
     const updateBooksPerPage = () => {
-      setBooksPerPage(window.innerWidth < 640 ? 2 : 5);
+      setBooksPerPage(window.innerWidth < 640 ? 1 : 5);
     };
     //  fetch all the books in the database related to a particular genre
     const fetchBooks = async () => {
@@ -44,11 +44,11 @@ const GenreCompo: React.FC<GenreProps> = ({ genre }) => {
   const startIndex = currentPage * booksPerPage;
   const selectedBooks = books.slice(startIndex, startIndex + booksPerPage);
   return (
-    <section key={genre.id} className="mt-[3em]">
-      <p className="p-2 font-title text-2xl">{genre.genre}</p>
+    <section key={genre.id} className="mt-[3em] md:mt-[13em] bg-white-100 pb-[2em] rounded-md">
+      <p className="p-2 font-sub text-2xl">{genre.genre}</p>
       <div className="flex justify-center relative">
         {totalPages > 1 && (
-          <button onClick={handlePrev}>
+          <button onClick={handlePrev} className="md:absolute left-3 top-[11em]">
             <Image
               src="/images/backward.png"
               alt="back icon"
@@ -64,11 +64,11 @@ const GenreCompo: React.FC<GenreProps> = ({ genre }) => {
           ))}
         </div>
         {totalPages > 1 && (
-          <button onClick={handleNext}>
+          <button onClick={handleNext} className="md:absolute right-3 top-[11em]">
             <Image
               src="/images/forward.png"
               alt="forward icon"
-              className="pt-9 w-[2.5em] md:w-[3em] relative -right-2 md:-right-[70px]"
+              className="pt-9 w-[2.5em] md:w-[3em] relative -right-2 md:-right-[70px] "
               width={70}
               height={30}
             />

@@ -17,11 +17,10 @@ const metadata: Metadata = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html>
-      <body className="bg-stylish-300">
+      <body className="bg-stylish-500">
         {/* Header goes in here */}
 
         <AuthProvider>
-          <HeaderComp></HeaderComp>
           <main>{children}</main>
           <footer></footer>
         </AuthProvider>

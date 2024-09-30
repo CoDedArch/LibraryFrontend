@@ -2,7 +2,9 @@
 export interface Book {
   id: number;
   title: string;
+  book_type: string;
   cover_img: string;
+  genre_name: string;
   publisher: string;
   publication_date: string;
   no_pages: number;

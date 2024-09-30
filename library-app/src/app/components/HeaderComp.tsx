@@ -3,17 +3,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import SearchResultsComp from "./SearchResultsComp";
+import { title } from "process";
 
 const LOGOUT_URL = "/api/logout";
 
 const HeaderComp: React.FC = () => {
   const auth = useAuth();
   const contribs = ["Add a Book"];
-  const browse_links = ["all books", "trending", "lists", "My Books"];
+  const browse_links = [
+    { title: "All Books", img: "/images/ff.png" },
+    { title: "Trending", img: "/images/trending.png" },
+    { title: "My Books", img: "/images/favorite.png" },
+  ];
   const search_fields = ["title", "publisher", "year"];
+  const [searchQuery, setSearchQuery] = useState("");
   const [showmenu, setShowMenu] = useState(false);
   const [showBrowseMenu, setShowBrowseMenu] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const browseRef = useRef<HTMLUListElement>(null);
 
@@ -21,6 +29,10 @@ const HeaderComp: React.FC = () => {
   // render menu will toggle the menu on and off
   const renderMenu = () => {
     setShowMenu(!showmenu);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   // browser menu will toggle the browse menu on and off
@@ -31,6 +43,7 @@ const HeaderComp: React.FC = () => {
   // when the user is in phone view and clicks on the search icon, toggles the search bar
   const handleSearchIconClick = () => {
     setShowSearchBar(window.innerWidth < 640 ? !showSearchBar : false);
+    setShowSearchResults(!showSearchResults);
   };
   useEffect(() => {
     // handles closing the menu bar when the user clicks outside of this refrence
@@ -76,24 +89,22 @@ const HeaderComp: React.FC = () => {
   }
 
   return (
-    <header className="flex flex-row justify-between p-2 text-lg md:pr-[9em] shadow-md">
+    <header className="bg-stylish-500 flex flex-row justify-between text-stylish-400 p-2 text-lg md:pr-[9em] shadow-md">
       {/* Browsing links to help users navigate to various sections */}
       {showBrowseMenu && (
         <>
           <ul
             ref={browseRef}
-            className={`absolute top-[6.4em] font-title right-3 md:top-[3.4em] md:left-[32em] z-[10000] bg-white-100 rounded-md w-[10em]`}
+            className={`absolute top-[6.4em] font-body right-3 md:top-[3.4em] md:left-[29em] z-[10000] bg-white-100 rounded-md w-[15em] p-2`}
           >
             {browse_links.map((link, link_index) => (
-              <li
-                key={link_index}
-                className="my-3 pt-2 hover:bg-stylish-400 text-stylish-400 cursor-pointer border-b-2 border-b-yellow-800 hover:bg-opacity-30"
-              >
+              <li key={link_index} className="flex hover:bg-stylish-600 border-b-2 border-b-stylish-600 hover:bg-opacity-20 transition-all space-x-14 pl-2">
+                <Image src={link.img} alt={link.title} className="w-[2em] h-[2em] mt-4" width={300} height={30} />
                 <Link
-                  href={link === "all books" ? "/" : `/${link}`}
-                  className="pl-2"
+                  href={link.title === "all books" ? "/" : `/${link.title}`}
+                  className="block my-3 pl-2 text-2xl pt-2 text-stylish-600 font-semibold cursor-pointer "
                 >
-                  {link}
+                  {link.title}
                 </Link>
               </li>
             ))}
@@ -101,18 +112,31 @@ const HeaderComp: React.FC = () => {
         </>
       )}
       {/* This contains the Logo and the Name of the application */}
-      <div className="p-2 font-bold font-main text-3xl flex space-x-6">
-        <Link href="/" className={`${showSearchBar ? "hidden" : "block"}`}>
-          Let&lsquo;s Learn
-        </Link>
-        <p className="absolute top-[2.4em] md:static font-extralight text-2xl md:text-lg p-1 md:bg-orange-200 bg-opacity-25 hover:bg-opacity-10 transition-opacity">
-          <a
-            href="http://"
-            className=" hover:text-stylish-400 transition-colors"
-          >
-            My Books
-          </a>
-        </p>
+      <div className="p-2 font-bold font-main text-stylish-400 md:text-3xl flex space-x-6">
+        <div className="flex space-x-1">
+          <Image
+            src="/images/logo.png"
+            className={`${
+              showSearchBar ? "hidden" : "block"
+            } w-[1em] md:w-[2em] md:h-[1em] h-6`}
+            alt="logo"
+            width={40}
+            height={30}
+          />
+          <Link href="/" className={`${showSearchBar ? "hidden" : "block"}`}>
+            Let&lsquo;s Learn
+          </Link>
+        </div>
+        {auth?.isAuthenticated && (
+          <p className="absolute top-[5em] md:static ">
+            <Link
+              href="/mybooks"
+              className="font-extralight transition-all text-2xl md:text-lg p-1 bg-stylish-300 rounded-tr-3xl rounded-bl-3xl hover:md:bg-blue-600 hover:bg-opacity-10 hover:text-white-100 border-2 border-stylish-400"
+            >
+              My Books
+            </Link>
+          </p>
+        )}
       </div>
       {/* This contains the search bar and menu icon as well as user profile and login, logout */}
       <div className="flex md:space-x-2">
@@ -121,10 +145,10 @@ const HeaderComp: React.FC = () => {
           className={`flex flex-row absolute ${
             auth?.isAuthenticated
               ? "top-[4.3em] right-[2em]"
-              : "top-[3.4em] right-[2em]"
+              : "top-[5em] right-[2em]"
           } md:static md:p-2`}
         >
-          <p className="font-extralight w-fit text-xl">Browse</p>
+          <p className="font-extralight w-fit">Browse</p>
           <div className="p-2 pl-[2px] mt-[2px] w-[2em]">
             {showBrowseMenu ? (
               <Image
@@ -150,13 +174,13 @@ const HeaderComp: React.FC = () => {
         <div
           className={`${
             showSearchBar ? "block" : "hidden"
-          } w-[15em] md:w-[20em] md:flex flex-row justify-between rounded-md border-r-2 border-orange-200`}
+          } w-[15em] md:w-[20em] md:flex flex-row justify-between rounded-md`}
         >
           <form action="">
             <select
               name=""
               id=""
-              className=" max-w-[2.7em] h-[2.8em] bg-orange-200 opacity-55 border-r-2 border-black rounded-l-md"
+              className=" max-w-[2.7em] h-[2.8em] bg-white-100 opacity-55 border-r-2 border-black rounded-l-md"
             >
               <option value="">All</option>
               {search_fields.map((field, field_index) => (
@@ -171,21 +195,20 @@ const HeaderComp: React.FC = () => {
             <input
               type="text"
               placeholder="Search"
-              className="pl-1 h-[2.6em] w-[9em] md:w-[14.3em] bg-orange-200 bg-opacity-20 text-black font-normal ml-1 border-r-2 border-black placeholder:text-black placeholder:font-light outline-none"
+              className="pl-2 h-[2.6em] w-[10em] md:w-[16.9em] bg-white-100 bg-opacity-70 text-black font-normal ml-1 border-r-2 border-black placeholder:text-black placeholder:font-light outline-none"
+              value={searchQuery}
+              onChange={handleInputChange}
             />
           </form>
-          <div className="md:p-2 md:static absolute top-5 right-[5.5em]">
-            <Image
-              src="/images/barcode.png"
-              alt="barcode reader"
-              className="cursor-pointer"
-              width={30}
-              height={50}
+          {showSearchResults && (
+            <SearchResultsComp
+              toggleSearchResults={setShowSearchResults}
+              search_query={searchQuery}
             />
-          </div>
+          )}
         </div>
         {/* search icon */}
-        <div className="relative md:-left-28 p-3">
+        <div className="relative md:-left-[3.4em] p-3">
           <Image
             src="/images/search.png"
             alt="search icon"
@@ -206,14 +229,14 @@ const HeaderComp: React.FC = () => {
         ) : (
           <Link
             href="/login"
-            className="hidden sm:block w-[5em] hover:text-green-500 transition-colors p-1 pt-2 font-bold font-main"
+            className="hidden sm:block w-[5em] hover:text-stylish-600 transition-colors p-1 pt-2 font-semibold font-body"
           >
-            Log in
+            LOGIN
           </Link>
         )}
         {/* also show the user profile if the user is authenticated */}
         {auth?.isAuthenticated ? (
-          <div className="pt-2 font-extralight underline">
+          <Link href="/account" className="pt-2 font-extralight underline">
             <Image
               src="/images/acct.png"
               className="w-[2em] cursor-pointer"
@@ -222,13 +245,13 @@ const HeaderComp: React.FC = () => {
               width={70}
               height={30}
             />
-          </div>
+          </Link>
         ) : (
           <Link
             href="/signup"
             className={`${
               showSearchBar ? "hidden" : "block"
-            } text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-black mt-1`}
+            } text-center pt-1 bg-stylish-600 text-white-100 hover:bg-creamy-100 hover:text-stylish-600 hover:border-stylish-600 transition-all w-[5em] h-[2em] rounded-md font-body font-semibold border-solid border-2 border-black mt-1`}
           >
             JOIN
           </Link>
@@ -256,25 +279,25 @@ const HeaderComp: React.FC = () => {
             ></div>
             <section
               ref={menuRef}
-              className="absolute bg-white-100 text-stylish-400 shadow-2xl z-[1000] -right-[0.5px] md:right-[1em] w-[11em] md:w-[21em] rounded-t-md h-[100vh]"
+              className="absolute flex flex-col items-center bg-white-100 text-stylish-600 shadow-2xl z-[1000] -right-[0.5px] md:right-[1em] w-[17em] md:w-[21em] rounded-t-md md:h-[100vh] h-fit"
             >
-              <p className="text-center border-b-2 border-b-yellow-800 font-bold">
+              <p className="text-center text-3xl w-[10em] border-b-2 border-b-stylish-600 font-sub">
                 my Let&apos;s learn
               </p>
-              <div className="flex justify-between space-x-2 md:space-x-3 py-[2em] p-3">
+              <div className="flex w-[15em] justify-between space-x-10 md:space-x-3 py-[2em] p-3">
                 {auth?.isAuthenticated ? (
                   <button
                     onClick={handleLogout}
-                    className="text-center hover:bg-red-400 hover:text-white-100 hover:border-black transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-red-400 mt-1"
+                    className="text-center hover:bg-red-400 hover:text-white-100 hover:border-black transition-all w-[8em] h-[2em] rounded-md font-main border-solid border-2 border-red-400 mt-1"
                   >
                     Log out
                   </button>
                 ) : (
                   <Link
                     href="/login"
-                    className="text-center pt-1 bg-creamy-100 hover:bg-creamy-100 hover:text-blue-500 hover:border-blue-500 transition-all w-[5em] h-[2em] rounded-md font-main text-green-500 border-solid border-2 border-black mt-1"
+                    className="text-center pt-1 bg-stylish-600 w-[7em] h-[2em] rounded-md font-body font-light text-white-100 border-solid border-2 border-stylish-600 mt-1"
                   >
-                    log in
+                    LOGIN
                   </Link>
                 )}
                 {auth?.isAuthenticated ? (
@@ -284,40 +307,51 @@ const HeaderComp: React.FC = () => {
                 ) : (
                   <Link
                     href="/signup"
-                    className="text-center pt-1 bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[5em] h-[2em] rounded-md font-main border-solid border-2 border-black mt-1"
+                    className="text-center pt-1 text-white-100 bg-stylish-600 w-[7em] h-[2em] rounded-md font-body font-semibold mt-1"
                   >
                     JOIN
                   </Link>
                 )}
               </div>
-              <p className="text-center border-b-2 border-b-yellow-800 font-bold mt-[5em]">
+              <p className="text-center text-3xl w-[10em] border-b-2 border-b-stylish-600 font-sub mt-[3em]">
                 Browse
               </p>
-              <ul className="py-[2em] p-3 font-title">
+              <ul className="py-[2em] flex flex-col items-start w-[15em] p-3 font-body">
                 {browse_links.map((link, link_index) => (
                   <li
                     key={link_index}
-                    className="pt-2 hover:bg-stylish-400 hover:bg-opacity-30"
+                    className="pt-2 flex text-2xl font-semibold hover:bg-stylish-600 hover:bg-opacity-20 transition-all p-3 w-[10em]"
                   >
+                    <Image
+                      src={link.img}
+                      alt={link.title}
+                      width={30}
+                      height={30}
+                    />
                     <Link
-                      href={link === "all books" ? "/" : `/${link}`}
+                      href={link.title === "all books" ? "/" : `/${link.title}`}
                       className="pl-2"
                     >
-                      {link}
+                      {link.title}
                     </Link>
                   </li>
                 ))}
               </ul>
-              <p className="text-center border-b-2 border-b-yellow-800 mt-3 font-bold mt-[5em]">
+              <p className="text-center w-[10em] text-3xl border-b-2 border-b-stylish-600 font-sub mt-[2em]">
                 Contribute
               </p>
               {contribs.map((contrib, contrib_index) => (
-                <p
+                <div
                   key={contrib_index}
-                  className="pl-2 shadow-md shadow-green-400 w-fit bg-creamy-100 ml-1aa mt-4 ml-3"
+                  className="flex flex-col items-start w-[15em]"
                 >
-                  <a href="">{contrib}</a>
-                </p>
+                  <Link
+                    href=""
+                    className="text-center pt-1 bg-stylish-600 w-[7em] h-[2em] rounded-md font-body font-light text-white-100 border-solid border-2 border-stylish-600 mt-10"
+                  >
+                    Add a Book
+                  </Link>
+                </div>
               ))}
             </section>
           </>

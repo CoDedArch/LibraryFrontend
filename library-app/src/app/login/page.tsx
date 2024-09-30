@@ -3,6 +3,7 @@ import { useAuth } from "@/components/authProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import LogoComp from "../components/LogoComp";
 
 const LOGIN_URL = "/api/login";
 export default function Login() {
@@ -69,99 +70,129 @@ export default function Login() {
     }
   }
   return (
-    <main className="h-[100vh] flex flex-col justify-center">
-      <div
-        className={`absolute top-[10em] md:top-[7em] right-2 md:right-[10em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 ${
-          showMessage ? "" : "hidden"
-        } ${messageStyle}`}
-      >
-        <p>{message}</p>
-      </div>
-      <section className="md:flex bg-orange-200 md:mx-[7em] bg-opacity-25 h-fit justify-between rounded-md shadow-md">
-        <div className="hidden w-1/2 md:flex flex-col justify-center px-7 border-r-2 border-r-creamy-100">
-          <p className="text-5xl font-title">
-            WELCOME <span className="text-orange-400">BACK!!</span>
-          </p>
-          <h2 className="pt-2 text-xl font-light">
-            Let&apos;s Learn, offers you a collection of it&apos;s digital
-            library contents.{" "}
-            <span className="font-description font-bold text-blue-900">
-              Read
-            </span>{" "}
-            our eBook,{" "}
-            <span className="font-description font-bold text-blue-900">
-              Listen{" "}
-            </span>
-            to our audiobook collections even as you are empowered to seek
-            knowledge for yourself.
-          </h2>
+    <>
+      <LogoComp />
+      <main className="h-[100vh] flex flex-col justify-center bg-stylish-500">
+        <div
+          className={`absolute top-[10em] md:top-[7em] right-2 md:right-[10em] w-[20em] h-[3em] md:h-[5em] rounded-md flex flex-col justify-center text-center border-2 border-green-800 ${
+            showMessage ? "" : "hidden"
+          } ${messageStyle}`}
+        >
+          <p>{message}</p>
         </div>
-        <div className="md:w-1/2 flex flex-col items-center pb-3">
-          <form
-            onSubmit={(event) => handleSubmit(event, setUsername, setPassword)}
-            className="p-2"
-          >
-            <legend className="font-bold pt-2">Username</legend>
-            <input
-              type="text"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              id=""
-              placeholder="Ex: johnDoe"
-              className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2"
+        <section className="md:flex text-stylish-400 md:mx-[7em] bg-opacity-25 h-fit justify-between">
+          {/* <div className="relative hidden w-1/2 md:flex flex-col justify-center border-r-2 border-r-creamy-100">
+            <Image
+              src="/images/loginImg.jpg"
+              alt="login pic"
+              width={400}
+              height={70}
+              className="w-[30em] opacity-30"
             />
-            <legend className="font-bold pt-2">Password</legend>
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              id=""
-              className="w-[17em] h-[2em] md:w-[25em] rounded-md outline-none pl-2"
-            />
-            <br />
+            <div className="absolute  p-2 text-justify bg-opacity-35 font-bold">
+              <p className="text-5xl font-main">
+                WELCOME <span className="text-orange-400">BACK!!</span>
+              </p>
+              <h2 className="pt-2 text-xl ">
+                Let&apos;s Learn, offers you a collection of it&apos;s digital
+                library contents.{" "}
+                <span className="font-description font-bold text-stylish-200">
+                  Read
+                </span>{" "}
+                our eBook,{" "}
+                <span className="font-description font-bold text-stylish-200">
+                  Listen{" "}
+                </span>
+                to our audiobook collections even as you are empowered to seek
+                knowledge for yourself.
+              </h2>
+            </div>
+          </div> */}
+          <div className="md:w-1/2 flex flex-col justify-center  items-center pb-3">
+            <div className="mb-2">
+              <h1 className="text-5xl font-sub text-stylish-400">
+                Welcome Back!
+              </h1>
+              <p>Have an account already? jump right in!</p>
+            </div>
+            <form
+              onSubmit={(event) =>
+                handleSubmit(event, setUsername, setPassword)
+              }
+              className="p-8 bg-white-100 rounded-md shadow-2xl"
+            >
+              <input
+                type="text"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                id=""
+                placeholder="Username"
+                className="w-[17em] h-[3em] md:w-[25em] rounded-md outline-none border-2 border-black pl-2 placeholder:font-bold placeholder:text-black block mb-2"
+              />
+              <input
+                type="password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                id=""
+                placeholder="Password"
+                className="w-[17em] h-[3em] md:w-[25em] border-2 border-black rounded-md outline-none pl-2  placeholder:font-bold placeholder:text-black"
+              />
+              <div className="flex mt-2 justify-between">
+                <div>
+                  <input type="checkbox" name="" id="" /> remember me
+                </div>
+                <div>
+                  <Link
+                    href=""
+                    className="font-bold hover:underline hover:transition-all"
+                  >
+                    {" "}
+                    Forgot password
+                  </Link>
+                </div>
+              </div>
+              <br />
+              <button
+                type="submit"
+                className="bg-stylish-600 text-white-100 font-body font-extrabold w-[17em] h-[2.5em] md:w-[25em] rounded-md border-2 border-black mt-2"
+              >
+                Login
+              </button>
+              
+            <div className="mt-2 text-center">
+              <p className="font-sub text-center">OR</p>
+            </div>
             <button
               type="submit"
-              className="bg-green-500 hover:bg-creamy-100 hover:text-green-500 hover:border-green-500 transition-all w-[17em] h-[2em] md:w-[25em] rounded-md font-mono border-solid border-2 border-black mt-2"
+              className="bg-black text-white-100 font-body font-extrabold transition-all p-2 space-x-5 md:space-x-20 flex h-[2.7em] w-[17em] md:w-[25em] rounded-md border-solid border-2 border-black mt-1"
             >
-              Login to account
-            </button>
-            <div className="flex mt-2 justify-between">
-              <div>
-                <input type="checkbox" name="" id="" /> remember me
+              <Image
+                src="/images/google.png"
+                alt="google icon"
+                width={30}
+                  height={20}
+                  className="pb-2"
+              />
+              <span className="">Login with Google</span>
+              </button>
+              <div className="mt-5">
+                Else <Link href="/signup" className="text-blue-500 underline hover:text-blue-700 hover:font-bold">Sign Up</Link>
               </div>
-              <div>
-                <Link
-                  href=""
-                  className="font-bold hover:underline hover:transition-all"
-                >
-                  {" "}
-                  Forgot password
-                </Link>
-              </div>
-            </div>
-          </form>
-          <div className="flex">
-            <p>OR</p>
+            </form>
           </div>
-          <button
-            type="submit"
-            className="hover:bg-blue-200 hover:bg-opacity-50 transition-all p-2 space-x-5 md:space-x-20 flex h-fit   w-[17em] md:w-[25em] rounded-md font-mono border-solid border-2 border-black mt-1"
-          >
-            <Image
-              src="/images/google.png"
-              alt="google icon"
-              width={30}
-              height={20}
-            />
-            <span className="pt-1">login with Google</span>
-          </button>
-          <div></div>
-        </div>
-      </section>
-    </main>
+          <Image
+            src="/images/landing.png"
+            alt="login logo"
+            className="w-[40em] h-[30em] hidden md:block"
+            width={1000}
+            height={60}
+          />
+        </section>
+      </main>
+    </>
   );
 }

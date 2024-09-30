@@ -32,7 +32,7 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
   const handleStreamingMode = () => setStreamingMode(!streamingMode);
 
   const showStreamingError = () => {
-    setShowMessage("You'll need to Login to read this book");
+    setShowMessage("You'll need to Login to access this book");
     setShowPrompt(true);
     setTimeout(() => {
       setShowPrompt(false)
@@ -156,27 +156,34 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
         <p>{message}</p>
       </div>
       <div className="relative top-[17em] md:static bg-blue-300 bg-opacity-10 p-2 md:w-1/5 flex flex-col items-center rounded-md border-r-2 border-2 border-black">
-        <div className="h-[13em] bg-blue-400 w-[10em]">
+        <div className="relative h-[13em] bg-stylish-400 w-[10em]">
           <Image
             src={book.cover_img}
-            className="w-full h-full"
+            className="w-full h-full transition-transform transform hover:scale-95"
             alt={book.title}
             width={1190}
             height={30}
           />
+          {
+          book.book_type == "AU" ? (<div className="bg-white-100 w-[7em] flex justify-center absolute top-0 right-0 rounded-md shadow-2xl shadow-stylish-600">
+            <Image
+          src="/images/audio.png"
+          alt="audio"
+          className="w-[4em]"
+          width={1230}
+          height={30}
+        />
+          </div>) : ""
+        }
         </div>
-        <p className="font-serif mt-2">
-          Genre:{" "}
-          <span className="font-bold font-description">&lt;Fictional&gt;</span>
-        </p>
         <button
-          className={`bg-green-700 ${
+          className={`bg-stylish-600 ${
             !auth?.isAuthenticated ? "flex justify-center pt-2" : ""
-          } bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-green-400 shadow-md hover:transition-colors font-bold`}
+          } bg-opacity-50 w-[9em] h-[2.5em] mt-1 rounded-md text-lg hover:bg-blue-700 hover:text-white-100 shadow-md transition-all font-bold`}
           onClick={auth?.isAuthenticated ? handleStreamingMode :  showStreamingError}
         >
           <span className={`${!auth?.isAuthenticated ? "block pr-2" : ""}`}>
-            Stream
+            {book.book_type === "AU" ? "Listen" : "Read" }
           </span>
           {!auth?.isAuthenticated && (
             <Image
@@ -203,7 +210,7 @@ const LeftBookComp: React.FC<BookProps> = ({ book }) => {
             <div key={index}>
               {book.total_downloads >= 1 ? (
                 <div
-                  className={`bg-green-200 shadow-md font-bold ${
+                  className={`bg-stylish-600 shadow-md text-white-100 font-bold ${
                     index === 1 ? "block" : "hidden"
                   } absolute h-8 w-8 text-center pt-1 border-1 border-black rounded-full md:left-28 left-[11em] top-[25em] z-[1000] md:top-[25.4em]`}
                 >

@@ -95,11 +95,14 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
       </div>
       {/* This section displays the details of a book */}
       <div className="mt-[1em]" id="Details">
-        <p className="p-4 text-2xl border-b-2 border-b-black">Book Details</p>
+        <p className="p-4 text-2xl font-body border-b-2 text-stylish-600 font-bold border-b-black">Book Details</p>
         <p className="pl-4 font-title text-lg">edition notes</p>
         <p className="pl-7 font-title text-lg">
           Source Title:<span className="italic font-bold"> {book.title}</span> (
           {book.publication_date})
+        </p>
+        <p className="pl-7 font-title text-lg">
+          Book Type:<span className="italic font-bold"> {book.book_type === "AU"? "Audio Book" : "E-Book"}</span>
         </p>
         <p className="pl-4 font-title text-lg mt-[1em]">The Physical Object</p>
         <p className="pl-7">
@@ -124,8 +127,8 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
       </div>
       {/* This Section displays the Books related to an Author */}
       <div className="mt-[2em]" id="Related">
-        <p className="font-light text-2xl">More Books by this Author</p>
-        <div className="flex space-x-2 md:space-x-10 justify-center mt-[2em]">
+        <p className="p-4 font-bold text-stylish-600 text-2xl font-body">More Books by this Author</p>
+        {!authorBooks ? (<div className="flex space-x-2 md:space-x-10 justify-center mt-[2em]">
           {/* More books from the author */}
           <div className="flex justify-center">
             <div className="flex flex-col justify-center mr-10">
@@ -164,7 +167,7 @@ const RightBookComp: React.FC<RightBookCompProps> = ({ book, publisher }) => {
               )}
             </div>
           </div>
-        </div>
+        </div>) : (<p className="p-7 font-bold font-sub">No related books for Author {book.publisher } !!!</p>)}
       </div>
     </div>
   );
